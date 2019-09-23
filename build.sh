@@ -6,8 +6,6 @@ CACHED=
 # cleanup existing images
 docker rmi nlzet/php56-cli --force && \
 docker rmi nlzet/php56-fpm --force && \
-docker rmi nlzet/php72-cli --force && \
-docker rmi nlzet/php72-fpm --force && \
 docker rmi nlzet/php73-cli --force && \
 docker rmi nlzet/php73-fpm --force
 
