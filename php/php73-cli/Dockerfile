@@ -78,6 +78,7 @@ RUN \
   jpegoptim \
   gifsicle \
   systemd \
+  ansible \
   msmtp \
   rsync \
   unzip \
@@ -154,7 +155,6 @@ RUN \
   mkdir -p /tmp/pngout && cd /tmp/pngout && wget -qq -O pngout.tar.gz http://static.jonof.id.au/dl/kenutils/pngout-20150319-linux.tar.gz && tar -xzvf pngout.tar.gz && mv pngout-20150319-linux/x86_64/pngout /usr/local/bin/pngout && which pngout && rm -Rf /tmp/pngout && \
   mkdir -p /tmp/dssim && cd /tmp/dssim && wget -qq -O dssim.zip https://github.com/kornelski/dssim/releases/download/${DSSIM_VERSION}/dssim-${DSSIM_VERSION}.zip && unzip dssim.zip && dpkg -i ./linux/dssim_${DSSIM_VERSION}_amd64.deb && which dssim && rm -Rf /tmp/dssim && \
   mkdir -p /tmp/mozjpeg && cd /tmp/mozjpeg && git clone --depth 1 https://github.com/mozilla/mozjpeg.git && cd mozjpeg && cmake -G"Unix Makefiles" && make && make install && ln -s /opt/mozjpeg/bin/cjpeg /usr/bin/cjpeg && which cjpeg && rm -rf /tmp/mozjpeg && \
-  mkdir -p /tmp/cjpeg-dssim && cd /tmp/cjpeg-dssim && wget -O cjpeg-dssim https://raw.githubusercontent.com/technopagan/cjpeg-dssim/master/cjpeg-dssim && chmod +x cjpeg-dssim && mv -v cjpeg-dssim /usr/bin/cjpeg-dssim && which cjpeg-dssim && rm -rf /tmp/cjpeg-dssim && \
   mkdir -p /tmp/pngquant && cd /tmp/pngquant && git clone -b ${PNGQUANT_VERSION} --depth 1 https://github.com/kornelski/pngquant.git . && make && make install && which pngquant && rm -rf /tmp/pngquant && \
   mkdir -p /tmp/jpegtran && cd /tmp/jpegtran && wget -qq -O jpegtran.tar.gz http://www.ijg.org/files/jpegsrc.v${JPEGTRAN_VERSION}.tar.gz && tar -xzvf jpegtran.tar.gz && cd /tmp/jpegtran/jpeg-${JPEGTRAN_VERSION}/ && ./configure && make && make test && make install && which jpegtran && rm -Rf /tmp/jpegtran
 
