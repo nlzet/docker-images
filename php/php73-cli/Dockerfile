@@ -79,6 +79,7 @@ RUN \
   gifsicle \
   systemd \
   ansible \
+  sendmail \
   msmtp \
   rsync \
   unzip \
