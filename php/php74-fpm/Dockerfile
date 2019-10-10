@@ -1,4 +1,4 @@
-FROM nlzet/php74-rc-cli
+FROM nlzet/php74-cli
 
 USER root
 RUN \
