@@ -1,5 +1,5 @@
 FROM composer:latest AS composer
-FROM php:7.4-rc-fpm
+FROM php:7.4-fpm
 
 ENV DEBIAN_FRONTEND noninteractive
 ENV XDEBUG_VERSION=beta
