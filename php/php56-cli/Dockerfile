@@ -126,6 +126,9 @@ RUN \
   docker-php-ext-install zip bz2 && \
   # ftp
   docker-php-ext-install ftp && \
+  # mongodb
+  pecl install mongodb && \
+  docker-php-ext-enable mongodb && \
   # ssh2
   pecl install ssh2-${SSH2_VERSION} && \
   docker-php-ext-enable ssh2 && \

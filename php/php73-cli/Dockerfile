@@ -122,6 +122,9 @@ RUN \
   docker-php-ext-install zip bz2 && \
   # ftp
   docker-php-ext-install ftp && \
+  # mongodb
+  pecl install mongodb && \
+  docker-php-ext-enable mongodb && \
   # amqp
   docker-php-ext-install sockets && \
   pecl install amqp && \
