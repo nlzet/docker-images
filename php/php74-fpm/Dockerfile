@@ -3,7 +3,7 @@ FROM nlzet/php74-cli
 USER root
 RUN \
     apt-get update && \
-    apt-get install -y supervisor && \
+    apt-get install -y openssh-server ansible supervisor && \
     systemctl enable ssh && service ssh start && \
     apt-get -y clean && apt-get -y purge && rm -rf /var/lib/apt/lists/* && rm -Rf /tmp/pear
 

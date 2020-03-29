@@ -1,6 +1,11 @@
 FROM composer:latest AS composer
 FROM php:7.3-fpm
 
+COPY --from=composer /usr/bin/composer /usr/local/bin/composer
+RUN chmod +x /usr/local/bin/composer && \
+  mkdir -p /home/www/.composer && \
+  chown 1000:1000 -R /home/www/.composer
+
 ENV DEBIAN_FRONTEND noninteractive
 ENV XDEBUG_VERSION=beta
 ENV DSSIM_VERSION=2.9.7
@@ -20,82 +25,31 @@ RUN \
   echo "nl_NL.UTF-8 UTF-8" >> /etc/locale.gen && \
   apt-get update --fix-missing && \
   apt-get install --no-install-recommends -y \
-  apt-transport-https \
-  libmcrypt-dev \
-  libmemcached-dev \
-  libxslt1-dev \
-  libffi-dev \
-  openssl \
-  bzip2 \
-  libcurl4-openssl-dev \
-  libpcre3-dev \
-  libreadline6-dev \
-  librecode-dev \
-  libsqlite3-dev \
-  libssl-dev \
-  libssl1.1 \
-  libmagickwand-dev \
-  libxml2-dev \
-  libicu-dev \
-  libxslt-dev \
-  gnupg2 \
-  imagemagick \
-  bc \
-  gcc \
-  g++ \
-  git \
-  zip \
-  libzip-dev \
-  locales \
-  telnet \
-  xvfb \
-  wget \
-  openssh-server \
-  ssh-client \
-  libfreetype6-dev \
-  libjpeg62-turbo-dev \
-  libjpeg-dev \
-  libpng-dev \
-  libgd-dev \
-  libgmp-dev \
-  libbz2-dev \
-  zlib1g-dev \
-  libssh2-1 \
-  libssh2-1-dev \
-  librabbitmq-dev \
-  build-essential \
-  autoconf \
-  automake \
-  libtool \
-  nasm \
-  make \
-  cmake \
-  pkg-config \
-  libz-dev \
-  libxrender-dev \
-  optipng \
-  pngcrush \
-  jpegoptim \
-  gifsicle \
-  systemd \
-  ansible \
-  sendmail \
-  msmtp \
-  rsync \
-  unzip \
+  automake libtool nasm cmake autoconf file g++ gcc \
+  libc-dev make gnupg2 pkg-config bzip2 \
+  git-core curl wget openssl unzip zip telnet rsync ssh-client  \
+  bc locales apt-transport-https \
+  libfreetype6-dev libjpeg62-turbo-dev libjpeg-dev libpng-dev libgd-dev \
+  libmcrypt-dev libmemcached-dev libxslt1-dev libicu-dev \
+  libffi-dev libcurl4-openssl-dev libpcre3-dev libreadline6-dev librecode-dev \
+  libsqlite3-dev libssl-dev libssl1.1 libxml2-dev libxslt-dev libzip-dev \
+  libgmp-dev libbz2-dev zlib1g-dev libssh2-1 libssh2-1-dev librabbitmq-dev \
+  libz-dev libxrender-dev libmagickwand-dev xvfb imagemagick \
+  optipng pngcrush jpegoptim gifsicle \
+  sendmail msmtp \
   golang-go && \
-  curl -sL https://deb.nodesource.com/setup_10.x | bash - && \
   curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | apt-key add - && \
   echo "deb https://dl.yarnpkg.com/debian/ stable main" | tee /etc/apt/sources.list.d/yarn.list && \
   apt-get update && \
-  apt-get install -y nodejs && \
-  apt-get install -y --no-install-recommends yarn && \
+  apt-get install -y --no-install-recommends nodejs yarn && \
   echo "node: $(node --version)" && \
   echo "npm: $(npm --version)" && \
   echo "yarn: $(yarn --version)" && \
   echo "convert: $(convert --version)" && \
   locale-gen && \
-  rm -rf /var/lib/apt/lists/*
+  apt-get -y clean && \
+  apt-get -y autoclean && \
+  rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* /tmp/pear /var/lib/cache/* /var/lib/log/*
 
 ENV PATH=/usr/local/bin:${PATH}
 ENV LD_LIBRARY_PATH=/usr/local/lib:${LD_LIBRARY_PATH}
@@ -136,7 +90,11 @@ RUN \
   docker-php-ext-install iconv curl soap && \
   pecl install xdebug-${XDEBUG_VERSION} && \
   # Allow extension enable for the user "www"
-  chown www:www -vR /usr/local/etc/php/conf.d/
+  chown www:www -vR /usr/local/etc/php/conf.d/ && \
+  apt-get -y clean && \
+  apt-get -y autoclean && \
+  apt-get purge -y --auto-remove -o APT::AutoRemove::RecommendsImportant=false && \
+  rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* /tmp/pear /var/lib/cache/* /var/lib/log/*
 
 # Download and install wkhtmltopdf
 RUN \
@@ -169,18 +127,9 @@ RUN go get github.com/mailhog/mhsendmail && \
   ln -s $(which mhsendmail) /usr/local/bin/mhsendmail && \
   which mhsendmail
 
-# Composer
-COPY --from=composer /usr/bin/composer /usr/local/bin/composer
-RUN chmod +x /usr/local/bin/composer && \
-  mkdir -p /home/www/.composer && \
-  chown 1000:1000 -R /home/www/.composer
-
-# Cleanup
-RUN apt-get -y clean && apt-get -y purge && rm -rf /var/lib/apt/lists/* && rm -Rf /tmp/pear
-
 # ENV
 VOLUME /app
-WORKDIR /app
+WORKDIR /var/www
 ENV TERM xterm
 
 USER www
