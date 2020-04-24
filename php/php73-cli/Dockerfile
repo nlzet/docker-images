@@ -1,17 +1,24 @@
 FROM composer:latest AS composer
 FROM php:7.3-fpm
 
-COPY --from=composer /usr/bin/composer /usr/local/bin/composer
-RUN chmod +x /usr/local/bin/composer && \
-  mkdir -p /home/www/.composer && \
-  chown 1000:1000 -R /home/www/.composer
-
 ENV DEBIAN_FRONTEND noninteractive
 ENV XDEBUG_VERSION=beta
 ENV DSSIM_VERSION=2.9.7
 ENV MOZJPEG_VERSION=3.3.1
 ENV PNGQUANT_VERSION=2.7.2
 ENV JPEGTRAN_VERSION=9c
+
+RUN \
+    mkdir -p /home/www/.composer && \
+    mkdir -p /usr/local/etc/php/conf.d && \
+    chown -vR 1000:1000 /home/www/.composer && \
+    chown -vR 1000:1000 /usr/local/etc/php/conf.d
+
+VOLUME /home/www/.composer
+VOLUME /usr/local/etc/php/conf.d
+
+COPY --from=composer /usr/bin/composer /usr/local/bin/composer
+RUN chmod +x /usr/local/bin/composer
 
 RUN \
   echo "date.timezone=UTC" > /usr/local/etc/php/conf.d/00-default.ini && \
