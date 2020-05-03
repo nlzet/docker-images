@@ -2,7 +2,6 @@ FROM composer:latest AS composer
 FROM php:7.4-fpm
 
 ENV DEBIAN_FRONTEND noninteractive
-ENV XDEBUG_VERSION=beta
 ENV DSSIM_VERSION=2.9.7
 ENV MOZJPEG_VERSION=3.3.1
 ENV PNGQUANT_VERSION=2.7.2
@@ -10,12 +9,9 @@ ENV JPEGTRAN_VERSION=9c
 
 RUN \
     mkdir -p /home/www/.composer && \
-    mkdir -p /usr/local/etc/php/conf.d && \
-    chown -vR 1000:1000 /home/www/.composer && \
-    chown -vR 1000:1000 /usr/local/etc/php/conf.d
+    chown -vR 1000:1000 /home/www/.composer
 
 VOLUME /home/www/.composer
-VOLUME /usr/local/etc/php/conf.d
 
 COPY --from=composer /usr/bin/composer /usr/local/bin/composer
 RUN chmod +x /usr/local/bin/composer
@@ -37,7 +33,7 @@ RUN \
   git-core curl wget openssl unzip zip telnet rsync ssh-client  \
   bc locales apt-transport-https \
   libfreetype6-dev libjpeg62-turbo-dev libjpeg-dev libpng-dev libgd-dev \
-  libmcrypt-dev libmemcached-dev libxslt1-dev libicu-dev \
+  libmcrypt-dev libxslt1-dev libicu-dev \
   libffi-dev libcurl4-openssl-dev libpcre3-dev libreadline6-dev librecode-dev \
   libsqlite3-dev libssl-dev libssl1.1 libxml2-dev libxslt-dev libzip-dev \
   libgmp-dev libbz2-dev zlib1g-dev libssh2-1 libssh2-1-dev librabbitmq-dev \
@@ -49,7 +45,7 @@ RUN \
   curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | apt-key add - && \
   echo "deb https://dl.yarnpkg.com/debian/ stable main" | tee /etc/apt/sources.list.d/yarn.list && \
   apt-get update && \
-  apt-get install -y --no-install-recommends nodejs yarn && \
+  apt-get install -y --no-install-recommends nodejs yarn npm && \
   echo "node: $(node --version)" && \
   echo "npm: $(npm --version)" && \
   echo "yarn: $(yarn --version)" && \
@@ -67,36 +63,13 @@ RUN ldconfig
 RUN \
   # intl
   docker-php-ext-configure intl && \
-  docker-php-ext-install intl && \
-  # dom/xml/xsl
-  docker-php-ext-install dom xmlrpc xsl && \
-  # gd/exif
+  ln -s /usr/include/x86_64-linux-gnu/gmp.h /usr/include/gmp.h && \
   docker-php-ext-configure gd --with-freetype=/usr/include/ --with-jpeg=/usr/include/ && \
   docker-php-ext-install -j$(nproc) gd exif && \
-  # database
-  docker-php-ext-install mysqli pdo pdo_mysql && \
-  # string
-  docker-php-ext-install gettext mbstring && \
-  # math
-  ln -s /usr/include/x86_64-linux-gnu/gmp.h /usr/include/gmp.h && \
-  docker-php-ext-install gmp bcmath && \
-  # compression
-  docker-php-ext-install zip bz2 && \
-  # ftp
-  docker-php-ext-install ftp && \
-  # mongodb
-  pecl install mongodb && \
-  docker-php-ext-enable mongodb && \
-  # amqp
+  docker-php-ext-install intl dom xmlrpc xsl gettext mbstring gmp bcmath zip bz2 ftp iconv curl soap mysqli pdo pdo_mysql && \
   docker-php-ext-install sockets && \
-  pecl install amqp && \
-  docker-php-ext-enable amqp && \
-  # imagick
-  pecl install imagick && \
-  docker-php-ext-enable imagick && \
-  # other extensions
-  docker-php-ext-install iconv curl soap && \
-  pecl install xdebug-${XDEBUG_VERSION} && \
+  pecl install mongodb amqp imagick xdebug && \
+  docker-php-ext-enable amqp mongodb imagick && \
   # Allow extension enable for the user "www"
   chown www:www -vR /usr/local/etc/php/conf.d/ && \
   apt-get -y clean && \
