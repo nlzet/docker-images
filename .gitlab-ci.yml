@@ -9,3 +9,21 @@ php73:cli:
     - docker login --username=$REGISTRY_USERNAME --password=$REGISTRY_PASSWORD registry.kreable.com
     - docker build --target cli -t nlzet/php73:cli php/php73 --no-cache --pull
     - docker push nlzet/php73:cli
+
+php73:fpm:
+  tags: ["docker"]
+  stage: build
+  image: docker:dind
+  script:
+    - docker login --username=$REGISTRY_USERNAME --password=$REGISTRY_PASSWORD registry.kreable.com
+    - docker build --target fpm -t nlzet/php73:fpm php/php73 --no-cache --pull
+    - docker push nlzet/php73:fpm
+
+php73:ci:
+  tags: ["docker"]
+  stage: build
+  image: docker:dind
+  script:
+    - docker login --username=$REGISTRY_USERNAME --password=$REGISTRY_PASSWORD registry.kreable.com
+    - docker build --target ci -t nlzet/php73:ci php/php73 --no-cache --pull
+    - docker push nlzet/php73:ci
