@@ -1,0 +1,11 @@
+stages:
+  - build
+
+php73:cli:
+  tags: ["docker"]
+  stage: build
+  image: docker:dind
+  script:
+    - docker login --username=$REGISTRY_USERNAME --password=$REGISTRY_PASSWORD registry.kreable.com
+    - docker build --target cli -t nlzet/php73:cli php/php73 --no-cache --pull
+    - docker push nlzet/php73:cli
