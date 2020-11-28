@@ -69,7 +69,7 @@ RUN \
   echo "node: $(node --version)" && \
   echo "npm: $(npm --version)" && \
   echo "yarn: $(yarn --version)" && \
-  echo "convert: $(convert --version)" && \
+  # echo "convert: $(convert --version)" && \
   # Allow extension enable for the user "www"
   chown www:www -vR /usr/local/etc/php/conf.d/ && \
   rm -rf /tmp/* /var/tmp/* /var/lib/{apt,dpkg,cache,log}/
