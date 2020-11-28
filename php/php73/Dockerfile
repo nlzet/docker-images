@@ -1,5 +1,5 @@
 FROM composer:latest AS composer
-FROM php:7.3-fpm as init-stage
+FROM $FROM_IMAGE as init-stage
 
 ADD https://raw.githubusercontent.com/mlocati/docker-php-extension-installer/master/install-php-extensions /usr/local/bin/
 

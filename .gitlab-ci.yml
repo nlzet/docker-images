@@ -1,75 +1,33 @@
 stages:
-  - cli
-  - fpm
-  - ci
+  - build
 
-php73:cli:
+php73:
   tags: ["docker"]
-  stage: cli
+  stage: build
   image: docker
   script:
     - docker login --username=$DOCKER_HUB_USERNAME --password=$DOCKER_HUB_PASSWORD
-    - docker build --target cli-stage -t nlzet/php73:cli php/php73 --no-cache --pull
+    - docker build --build-arg FROM_IMAGE=php:7.3-cli --target cli-stage -t nlzet/php73:cli php/php73 --pull
     - docker push nlzet/php73:cli
-  services:
-    - name: docker:dind
-      alias: docker
-
-php73:fpm:
-  tags: ["docker"]
-  stage: fpm
-  image: docker
-  script:
-    - docker login --username=$DOCKER_HUB_USERNAME --password=$DOCKER_HUB_PASSWORD
-    - docker build --target fpm-stage -t nlzet/php73:fpm --cache-from=nlzet/php73:cli-stage --pull php/php73
+    - docker build --build-arg FROM_IMAGE=php:7.3-fpm --target fpm-stage -t nlzet/php73:fpm php/php73
     - docker push nlzet/php73:fpm
-  services:
-    - name: docker:dind
-      alias: docker
-
-php73:ci:
-  tags: ["docker"]
-  stage: ci
-  image: docker
-  script:
-    - docker login --username=$DOCKER_HUB_USERNAME --password=$DOCKER_HUB_PASSWORD
-    - docker build --target ci-stage -t nlzet/php73:ci --cache-from=nlzet/php73:fpm-stage --pull php/php73
+    - docker build  --build-arg FROM_IMAGE=php:7.3-fpm--target ci-stage -t nlzet/php73:ci --cache-from=nlzet/php73:fpm-stage php/php73
     - docker push nlzet/php73:ci
   services:
     - name: docker:dind
       alias: docker
 
-php74:cli:
+php74:
   tags: ["docker"]
-  stage: cli
+  stage: build
   image: docker
   script:
     - docker login --username=$DOCKER_HUB_USERNAME --password=$DOCKER_HUB_PASSWORD
-    - docker build --target cli-stage -t nlzet/php74:cli --no-cache --pull php/php74 
+    - docker build --build-arg FROM_IMAGE=php:7.4-cli --target cli-stage -t nlzet/php74:cli --pull php/php74
     - docker push nlzet/php74:cli
-  services:
-    - name: docker:dind
-      alias: docker
-
-php74:fpm:
-  tags: ["docker"]
-  stage: fpm
-  image: docker
-  script:
-    - docker login --username=$DOCKER_HUB_USERNAME --password=$DOCKER_HUB_PASSWORD
-    - docker build --target fpm-stage -t nlzet/php74:fpm --cache-from=nlzet/php74:cli-stage --pull php/php74
+    - docker build --build-arg FROM_IMAGE=php:7.4-fpm --target fpm-stage -t nlzet/php74:fpm php/php74
     - docker push nlzet/php74:fpm
-  services:
-    - name: docker:dind
-      alias: docker
-
-php74:ci:
-  tags: ["docker"]
-  stage: ci
-  image: docker
-  script:
-    - docker login --username=$DOCKER_HUB_USERNAME --password=$DOCKER_HUB_PASSWORD
-    - docker build --target ci-stage -t nlzet/php74:ci --cache-from=nlzet/php73:fpm-stage --pull php/php74 
+    - docker build --build-arg FROM_IMAGE=php:7.4-fpm --target ci-stage -t nlzet/php74:ci --cache-from=nlzet/php74:fpm-stage php/php74 
     - docker push nlzet/php74:ci
   services:
     - name: docker:dind
