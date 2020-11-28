@@ -34,9 +34,7 @@ RUN \
   # disable xdebug by default, only enable in fpm by mounting ini file.
   rm -f /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini 
 
-FROM init-stage as cli
-
-RUN echo cli > /tmp/id.txt
+FROM init-stage as cli-stage
 
 VOLUME /app
 WORKDIR /var/www
@@ -44,7 +42,7 @@ ENV TERM xterm
 
 USER www
 
-FROM cli as fpm
+FROM cli-stage as fpm-stage
 
 USER root
 
@@ -104,10 +102,8 @@ RUN go get github.com/mailhog/mhsendmail && \
   ln -s $(which mhsendmail) /usr/local/bin/mhsendmail && \
   which mhsendmail
 
-RUN echo fpm > /tmp/id.txt
-
-# RUN \
-#   chown -R 1000:1000 /home/www/ && \
+RUN \
+  chown -R 1000:1000 /home/www/
 #   apt-get -y clean && \
 #   # apt-get -y autoclean && \
 #   DEBIAN_FRONTEND=noninteractive apt-get remove --purge -y icu-devtools* libfreetype6-dev* libicu-dev* libjpeg62-turbo-dev* libpng-dev* \
@@ -118,9 +114,7 @@ RUN echo fpm > /tmp/id.txt
 # 	docker-php-source delete && \
 # 	rm -rf /tmp/pear /var/lib/apt/lists/* /tmp/src /tmp/* /var/tmp/* /tmp/pickle /tmp/pickle.tmp /var/lib/log/* /var/lib/cache/*
 
-FROM fpm as ci
-
-RUN echo ci > /tmp/id.txt
+FROM fpm-stage as ci-stage
 
 USER www
 
