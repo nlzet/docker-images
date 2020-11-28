@@ -30,7 +30,9 @@ RUN \
   locale-gen && \
   apt-get -y clean && \
   apt-get -y autoclean && \
-  rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* /tmp/pear /var/lib/cache/* /var/lib/log/*
+  rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* /tmp/pear /var/lib/cache/* /var/lib/log/* && \
+  # disable xdebug by default, only enable in fpm by mounting ini file.
+  rm -f /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini 
 
 FROM init-stage as cli
 
