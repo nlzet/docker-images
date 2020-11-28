@@ -1,11 +1,13 @@
-ARG PHP_EXTENSIONS="gd xdebug intl xmlrpc xsl gettext gmp bcmath zip bz2 soap mysqli pdo_mysql pdo_pgsql mongodb amqp imagick igbinary ssh2 exif mcrypt redis"
-ARG FROM_IMAGE=php:7
+ARG FROM_IMAGE
 FROM composer:latest AS composer
 FROM $FROM_IMAGE as init-stage
+
+ARG PHP_EXTENSIONS
 
 ADD https://raw.githubusercontent.com/mlocati/docker-php-extension-installer/master/install-php-extensions /usr/local/bin/
 
 RUN chmod +x /usr/local/bin/install-php-extensions && sync && \
+    echo install-php-extensions ${PHP_EXTENSIONS} && \
     install-php-extensions ${PHP_EXTENSIONS} && \
     # disable xdebug by default, only enable in fpm by mounting ini file.
     rm -f /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini && \
