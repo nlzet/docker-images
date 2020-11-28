@@ -45,7 +45,7 @@ php74:cli:
   image: docker
   script:
     - docker login --username=$DOCKER_HUB_USERNAME --password=$DOCKER_HUB_PASSWORD
-    - docker build --target cli-stage -t nlzet/php74:cli--no-cache --pull php/php74 
+    - docker build --target cli-stage -t nlzet/php74:cli --no-cache --pull php/php74 
     - docker push nlzet/php74:cli
   services:
     - name: docker:dind

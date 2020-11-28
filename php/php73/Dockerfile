@@ -4,7 +4,7 @@ FROM php:7.3-fpm as init-stage
 ADD https://raw.githubusercontent.com/mlocati/docker-php-extension-installer/master/install-php-extensions /usr/local/bin/
 
 RUN chmod +x /usr/local/bin/install-php-extensions && sync && \
-    install-php-extensions gd xdebug intl dom xmlrpc xsl gettext mbstring gmp bcmath zip bz2 ftp iconv curl soap mysqli pdo pdo_mysql pdo_pgsql mongodb amqp imagick igbinary
+    install-php-extensions gd xdebug intl xmlrpc xsl gettext gmp bcmath zip bz2 soap mysqli pdo_mysql pdo_pgsql mongodb amqp imagick igbinary ssh2 exif mcrypt redis
 
 RUN \
     mkdir -p /home/www/.composer && \
