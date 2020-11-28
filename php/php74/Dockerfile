@@ -62,7 +62,9 @@ RUN \
   apt-get update && \
   # util + image-optim libs
   apt-get install -y --no-install-recommends xvfb sendmail msmtp golang-go nodejs yarn \
-  imagemagick optipng pngcrush jpegoptim gifsicle && \
+  # wkhtmltopdf deps
+  libfontconfig1 libxrender1 \
+  optipng pngcrush jpegoptim gifsicle && \
   echo "node: $(node --version)" && \
   echo "npm: $(npm --version)" && \
   echo "yarn: $(yarn --version)" && \
@@ -70,20 +72,6 @@ RUN \
   # Allow extension enable for the user "www"
   chown www:www -vR /usr/local/etc/php/conf.d/ && \
   rm -rf /tmp/* /var/tmp/* /var/lib/{apt,dpkg,cache,log}/
-
-# wkhtmltopdf
-RUN \
-  wget -qq 'https://github.com/wkhtmltopdf/wkhtmltopdf/releases/download/0.12.4/wkhtmltox-0.12.4_linux-generic-amd64.tar.xz' && \
-  tar -xf wkhtmltox-0.12.4_linux-generic-amd64.tar.xz && \
-  rm -f wkhtmltox-0.12.4_linux-generic-amd64.tar.xz && \
-  ls -lah && \
-  cd wkhtmltox/bin && \
-  mv wkhtmltopdf /usr/local/bin/wkhtmltopdf && \
-  mv wkhtmltoimage /usr/local/bin/wkhtmltoimage && \
-  wkhtmltopdf --version && \
-  wkhtmltoimage --version && \
-  cd - && \
-  rm -Rf wkhtmltox/
 
 # # Image optim libraries
 RUN \
@@ -102,6 +90,20 @@ RUN \
     ln -s $(which mhsendmail) /usr/local/bin/mhsendmail && \
     which mhsendmail && \
     chown -R 1000:1000 /home/www/
+
+# wkhtmltopdf
+RUN \
+  wget -qq 'https://github.com/wkhtmltopdf/wkhtmltopdf/releases/download/0.12.4/wkhtmltox-0.12.4_linux-generic-amd64.tar.xz' && \
+  tar -xf wkhtmltox-0.12.4_linux-generic-amd64.tar.xz && \
+  rm -f wkhtmltox-0.12.4_linux-generic-amd64.tar.xz && \
+  ls -lah && \
+  cd wkhtmltox/bin && \
+  mv wkhtmltopdf /usr/local/bin/wkhtmltopdf && \
+  mv wkhtmltoimage /usr/local/bin/wkhtmltoimage && \
+  wkhtmltopdf --version && \
+  wkhtmltoimage --version && \
+  cd - && \
+  rm -Rf wkhtmltox/
 
 FROM fpm-stage as ci-stage
 
