@@ -1,4 +1,4 @@
-ARG PHP_EXTENSIONS=gd xdebug intl xmlrpc xsl gettext gmp bcmath zip bz2 soap mysqli pdo_mysql pdo_pgsql mongodb amqp imagick igbinary ssh2 exif mcrypt redis
+ARG PHP_EXTENSIONS="gd xdebug intl xmlrpc xsl gettext gmp bcmath zip bz2 soap mysqli pdo_mysql pdo_pgsql mongodb amqp imagick igbinary ssh2 exif mcrypt redis"
 ARG FROM_IMAGE=php:7
 FROM composer:latest AS composer
 FROM $FROM_IMAGE as init-stage
