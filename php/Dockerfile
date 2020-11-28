@@ -1,11 +1,12 @@
-ARG FROM_IMAGE=php:7.3-fpm
+ARG PHP_EXTENSIONS=gd xdebug intl xmlrpc xsl gettext gmp bcmath zip bz2 soap mysqli pdo_mysql pdo_pgsql mongodb amqp imagick igbinary ssh2 exif mcrypt redis
+ARG FROM_IMAGE=php:7
 FROM composer:latest AS composer
 FROM $FROM_IMAGE as init-stage
 
 ADD https://raw.githubusercontent.com/mlocati/docker-php-extension-installer/master/install-php-extensions /usr/local/bin/
 
 RUN chmod +x /usr/local/bin/install-php-extensions && sync && \
-    install-php-extensions gd xdebug intl xmlrpc xsl gettext gmp bcmath zip bz2 soap mysqli pdo_mysql pdo_pgsql mongodb amqp imagick igbinary ssh2 exif mcrypt redis && \
+    install-php-extensions ${PHP_EXTENSIONS} && \
     # disable xdebug by default, only enable in fpm by mounting ini file.
     rm -f /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini && \
     mkdir -p /home/www/.composer && \
@@ -60,9 +61,7 @@ RUN \
   curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | apt-key add - && \
   echo "deb https://dl.yarnpkg.com/debian/ stable main" | tee /etc/apt/sources.list.d/yarn.list && \
   apt-get update && \
-  # util + image-optim libs
   apt-get install -y --no-install-recommends xvfb sendmail msmtp golang-go nodejs yarn \
-  # wkhtmltopdf deps
   libfontconfig1 libxrender1 \
   optipng pngcrush jpegoptim gifsicle && \
   echo "node: $(node --version)" && \
@@ -73,7 +72,7 @@ RUN \
   chown www:www -vR /usr/local/etc/php/conf.d/ && \
   rm -rf /tmp/* /var/tmp/* /var/lib/{apt,dpkg,cache,log}/
 
-# # Image optim libraries
+# Image optim libraries
 RUN \
     buildDeps='gcc libc6-dev make cmake bison' && \
     pkgExtra='libfreetype6-dev libpng-dev zlib1g-dev libicu-dev libjpeg62-turbo-dev libjpeg-dev libjpeg62-turbo libssl-dev build-essential' && \
@@ -88,10 +87,10 @@ RUN \
     apt-get purge -y --auto-remove $buildDeps && \
     rm -rf /tmp/* /var/tmp/* /var/lib/{apt,dpkg,cache,log}/
 
+# Mailhog sendmail helper
 RUN \
-    # Mailhog sendmail helper
     go get github.com/mailhog/mhsendmail && \
-    ln -s $(which mhsendmail) /usr/local/bin/mhsendmail && \
+    ln -sf $(which mhsendmail) /usr/local/bin/mhsendmail && \
     which mhsendmail && \
     chown -R 1000:1000 /home/www/
 
@@ -111,13 +110,16 @@ RUN \
 
 FROM fpm-stage as ci-stage
 
-USER www
-ENV PATH="${PATH}:/home/www/.yarn/bin/"
-RUN yarn global add @quasar/cli @vue/cli cypress pm2 @api-platform/client-generator eslint jshint tslint && \
-  yarn cache clean && \
-  cypress install && \
+USER root
+
+RUN \
   wget https://get.symfony.com/cli/installer -O - | bash && \
   mv ~/.symfony/bin/symfony /usr/local/bin/symfony && \
   /usr/local/bin/symfony server:ca:install && \
   cp -r /root/.symfony/ /home/www/ && \
   chown 1000:1000 -R /home/www/
+
+USER www
+ENV PATH="${PATH}:/home/www/.yarn/bin/"
+RUN yarn global add @quasar/cli @vue/cli cypress pm2 @api-platform/client-generator eslint jshint tslint && \
+  yarn cache clean
