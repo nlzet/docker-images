@@ -75,7 +75,7 @@ RUN \
 
 # # Image optim libraries
 RUN \
-    buildDeps='gcc libc6-dev make' && \
+    buildDeps='gcc libc6-dev make cmake bison' && \
     set -x && \
     apt-get update && apt-get install -y $buildDeps --no-install-recommends && \
     mkdir -p /tmp/pngout && cd /tmp/pngout && wget -qq -O pngout.tar.gz http://static.jonof.id.au/dl/kenutils/pngout-20150319-linux.tar.gz && tar -xzvf pngout.tar.gz && mv pngout-20150319-linux/x86_64/pngout /usr/local/bin/pngout && which pngout && rm -Rf /tmp/pngout && \
