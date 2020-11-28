@@ -9,9 +9,9 @@ php73:
     - docker login --username=$DOCKER_HUB_USERNAME --password=$DOCKER_HUB_PASSWORD
     - docker build --build-arg FROM_IMAGE=php:7.3-cli --target cli-stage -t nlzet/php73:cli php/php73 --pull
     - docker push nlzet/php73:cli
-    - docker build --build-arg FROM_IMAGE=php:7.3-fpm --target fpm-stage -t nlzet/php73:fpm php/php73
+    - docker build --target fpm-stage -t nlzet/php73:fpm php/php73
     - docker push nlzet/php73:fpm
-    - docker build  --build-arg FROM_IMAGE=php:7.3-fpm--target ci-stage -t nlzet/php73:ci --cache-from=nlzet/php73:fpm-stage php/php73
+    - docker build --target ci-stage -t nlzet/php73:ci --cache-from=nlzet/php73:fpm-stage php/php73
     - docker push nlzet/php73:ci
   services:
     - name: docker:dind
@@ -25,9 +25,9 @@ php74:
     - docker login --username=$DOCKER_HUB_USERNAME --password=$DOCKER_HUB_PASSWORD
     - docker build --build-arg FROM_IMAGE=php:7.4-cli --target cli-stage -t nlzet/php74:cli --pull php/php74
     - docker push nlzet/php74:cli
-    - docker build --build-arg FROM_IMAGE=php:7.4-fpm --target fpm-stage -t nlzet/php74:fpm php/php74
+    - docker build --target fpm-stage -t nlzet/php74:fpm php/php74
     - docker push nlzet/php74:fpm
-    - docker build --build-arg FROM_IMAGE=php:7.4-fpm --target ci-stage -t nlzet/php74:ci --cache-from=nlzet/php74:fpm-stage php/php74 
+    - docker build --target ci-stage -t nlzet/php74:ci --cache-from=nlzet/php74:fpm-stage php/php74 
     - docker push nlzet/php74:ci
   services:
     - name: docker:dind

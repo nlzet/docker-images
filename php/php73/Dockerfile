@@ -1,3 +1,4 @@
+ARG FROM_IMAGE=php:7.3-fpm
 FROM composer:latest AS composer
 FROM $FROM_IMAGE as init-stage
 
