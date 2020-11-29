@@ -30,22 +30,26 @@ RUN \
   echo "en_US.UTF-8 UTF-8" >> /etc/locale.gen && \
   echo "nl_NL.UTF-8 UTF-8" >> /etc/locale.gen && \
   apt-get update && \
-  apt-get install -y locales git-core curl wget openssl unzip telnet rsync ssh-client zip && \
+  apt-get install -y tree locales git-core curl wget openssl unzip telnet rsync ssh-client zip && \
   locale-gen && \
   apt-get -y clean && \
   apt-get -y autoclean && \
-  rm -rf /tmp/* /var/tmp/* /var/lib/{apt,dpkg,cache,log}/
+  rm -rf /tmp/* /var/tmp/* /var/lib/{apt,dpkg,cache,log}/ && \
+  tree -L 8 / > /tmp/stage0.txt
+
 
 ENV TERM xterm
 VOLUME /app
 WORKDIR /var/www
 
-FROM init-stage as cli-stage
+FROM init-stage as stage1
 
 USER www
 ENV TERM xterm
 
-FROM cli-stage as fpm-stage
+RUN tree -L 8 / > /tmp/stage1.txt
+
+FROM stage1 as stage2
 
 ENV PATH $PATH:/home/www/go/bin
 ENV GOPATH /home/www/go
@@ -110,7 +114,9 @@ RUN \
   cd - && \
   rm -Rf wkhtmltox/
 
-FROM fpm-stage as ci-stage
+RUN tree -L 8 / > /tmp/stage2.txt
+
+FROM stage2 as stage3
 
 USER root
 
@@ -125,3 +131,5 @@ USER www
 ENV PATH="${PATH}:/home/www/.yarn/bin/"
 RUN yarn global add @quasar/cli @vue/cli cypress pm2 @api-platform/client-generator eslint jshint tslint && \
   yarn cache clean
+
+RUN tree -L 8 / > /tmp/stage3.txt

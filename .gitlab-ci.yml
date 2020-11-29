@@ -6,16 +6,11 @@ php73:
   stage: build
   image: docker
   script:
-    - export DOCKER_PREFIX=nlzet/php:7.3-
+    - export DOCKER_PREFIX=nlzet/php:7.3
     - export PHP_FROM=php:7.3-fpm
     - export PHP_EXTENSIONS="gd xdebug intl xmlrpc xsl gettext gmp bcmath zip bz2 soap mysqli pdo_mysql pdo_pgsql mongodb amqp imagick igbinary ssh2 exif mcrypt redis"
     - docker login --username=$DOCKER_HUB_USERNAME --password=$DOCKER_HUB_PASSWORD
-    - docker build --build-arg PHP_EXTENSIONS="${PHP_EXTENSIONS}" --build-arg FROM_IMAGE=${PHP_FROM} --target cli-stage -t ${DOCKER_PREFIX}cli php/ --pull
-    - docker push ${DOCKER_PREFIX}cli
-    - docker build --build-arg PHP_EXTENSIONS="${PHP_EXTENSIONS}"  --build-arg FROM_IMAGE=${PHP_FROM} --target fpm-stage -t ${DOCKER_PREFIX}fpm --cache-from=${DOCKER_PREFIX}cli php/
-    - docker push ${DOCKER_PREFIX}fpm
-    - docker build --build-arg PHP_EXTENSIONS="${PHP_EXTENSIONS}"  --build-arg FROM_IMAGE=${PHP_FROM} --target ci-stage -t ${DOCKER_PREFIX}ci --cache-from=${DOCKER_PREFIX}fpm php/
-    - docker push ${DOCKER_PREFIX}ci
+    - ./php/build.sh
   services:
     - name: docker:dind
       alias: docker
@@ -25,16 +20,12 @@ php74:
   stage: build
   image: docker
   script:
-    - export DOCKER_PREFIX=nlzet/php:7.4-
+    - export DOCKER_PREFIX=nlzet/php:7.4
     - export PHP_FROM=php:7.4-fpm
-    - export PHP_EXTENSIONS=gd xdebug intl xmlrpc xsl gettext gmp bcmath zip bz2 soap mysqli pdo_mysql pdo_pgsql mongodb amqp imagick igbinary ssh2 exif mcrypt redis
+    - export PHP_EXTENSIONS="gd xdebug intl xmlrpc xsl gettext gmp bcmath zip bz2 soap mysqli pdo_mysql pdo_pgsql mongodb amqp imagick igbinary ssh2 exif mcrypt redis"
     - docker login --username=$DOCKER_HUB_USERNAME --password=$DOCKER_HUB_PASSWORD
-    - docker build --build-arg PHP_EXTENSIONS="${PHP_EXTENSIONS}" --build-arg FROM_IMAGE=${PHP_FROM} --target cli-stage -t ${DOCKER_PREFIX}cli php/ --pull
-    - docker push ${DOCKER_PREFIX}cli
-    - docker build --build-arg PHP_EXTENSIONS="${PHP_EXTENSIONS}"  --build-arg FROM_IMAGE=${PHP_FROM} --target fpm-stage -t ${DOCKER_PREFIX}fpm --cache-from=${DOCKER_PREFIX}cli php/
-    - docker push ${DOCKER_PREFIX}fpm
-    - docker build --build-arg PHP_EXTENSIONS="${PHP_EXTENSIONS}"  --build-arg FROM_IMAGE=${PHP_FROM} --target ci-stage -t ${DOCKER_PREFIX}ci --cache-from=${DOCKER_PREFIX}fpm php/
-    - docker push ${DOCKER_PREFIX}ci
+    - ./php/build.sh
+
   services:
     - name: docker:dind
       alias: docker
@@ -44,16 +35,11 @@ php80:
   stage: build
   image: docker
   script:
-    - export DOCKER_PREFIX=nlzet/php:8.0-
+    - export DOCKER_PREFIX=nlzet/php:8.0
     - export PHP_FROM=php:8.0.0RC5-fpm
-    - export PHP_EXTENSIONS=gd xdebug intl xmlrpc xsl gettext gmp bcmath zip bz2 soap mysqli pdo_mysql pdo_pgsql mongodb amqp imagick igbinary ssh2 exif mcrypt redis
+    - export PHP_EXTENSIONS="gd xdebug intl xmlrpc xsl gettext gmp bcmath zip bz2 soap mysqli pdo_mysql pdo_pgsql mongodb amqp imagick igbinary ssh2 exif mcrypt redis"
     - docker login --username=$DOCKER_HUB_USERNAME --password=$DOCKER_HUB_PASSWORD
-    - docker build --build-arg PHP_EXTENSIONS="${PHP_EXTENSIONS}" --build-arg FROM_IMAGE=${PHP_FROM} --target cli-stage -t ${DOCKER_PREFIX}cli php/ --pull
-    - docker push ${DOCKER_PREFIX}cli
-    - docker build --build-arg PHP_EXTENSIONS="${PHP_EXTENSIONS}"  --build-arg FROM_IMAGE=${PHP_FROM} --target fpm-stage -t ${DOCKER_PREFIX}fpm --cache-from=${DOCKER_PREFIX}cli php/
-    - docker push ${DOCKER_PREFIX}fpm
-    - docker build --build-arg PHP_EXTENSIONS="${PHP_EXTENSIONS}"  --build-arg FROM_IMAGE=${PHP_FROM} --target ci-stage -t ${DOCKER_PREFIX}ci --cache-from=${DOCKER_PREFIX}fpm php/
-    - docker push ${DOCKER_PREFIX}ci
+    - ./php/build.sh
   services:
     - name: docker:dind
       alias: docker
