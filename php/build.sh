@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/usr/bin/env sh
 
 docker build --build-arg PHP_EXTENSIONS="${PHP_EXTENSIONS}" --build-arg FROM_IMAGE=${PHP_FROM} --target stage1 -t ${DOCKER_PREFIX}-cli php/ --pull
 docker push ${DOCKER_PREFIX}cli
