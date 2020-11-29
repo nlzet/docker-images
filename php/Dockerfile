@@ -113,11 +113,11 @@ RUN \
   cd - && \
   rm -Rf wkhtmltox/
 
+CMD ["/usr/local/sbin/php-fpm"]
+
 RUN tree -L 8 / > /tmp/stage2.txt
 
 FROM stage2 as stage3
-
-USER root
 
 RUN \
   wget https://get.symfony.com/cli/installer -O - | bash && \
@@ -131,5 +131,7 @@ ENV PATH="${PATH}:/home/www/.yarn/bin/"
 RUN yarn global add @quasar/cli @vue/cli cypress @api-platform/client-generator && \
   yarn cache clean && \
   rm -rf /tmp/* /var/tmp/* /var/lib/{apt,dpkg,cache,log}/
+
+CMD ["php", "-a"]
 
 RUN tree -L 8 / > /tmp/stage3.txt
