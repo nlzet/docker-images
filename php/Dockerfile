@@ -57,8 +57,15 @@ ENV DSSIM_VERSION=2.9.7
 ENV MOZJPEG_VERSION=3.3.1
 ENV PNGQUANT_VERSION=2.7.2
 ENV JPEGTRAN_VERSION=9c
-ENV MHSENDMAIL_VERSION=2.0
+ENV MHSENDMAIL_VERSION=0.2.0
 
+# Mailhog sendmail helper
+RUN \
+    wget -qq -O /usr/local/bin/mhsendmail https://github.com/mailhog/mhsendmail/releases/download/v${MHSENDMAIL_VERSION}/mhsendmail_linux_amd64 && \
+    chmod +x /usr/local/bin/mhsendmail && \
+    which mhsendmail
+
+# node/yarn/apt
 RUN \
   curl -sL https://deb.nodesource.com/setup_12.x | bash - && \
   curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | apt-key add - && \
@@ -77,7 +84,7 @@ RUN \
   chown www:www -R /usr/local/etc/php/conf.d/ && \
   rm -rf /tmp/* /var/tmp/* /var/lib/{apt,dpkg,cache,log}/
 
-# Image optim libraries
+# build extra image optim libraries
 RUN \
     buildDeps='gcc libc6-dev make cmake build-essential' && \
     pkgExtra='libfreetype6-dev libpng-dev zlib1g-dev libicu-dev libjpeg62-turbo-dev libjpeg-dev libjpeg62-turbo libssl-dev' && \
@@ -91,12 +98,6 @@ RUN \
     cd /root && \
     apt-get purge -y --auto-remove $buildDeps && \
     rm -rf /tmp/* /var/tmp/* /var/lib/{apt,dpkg,cache,log}/
-
-# Mailhog sendmail helper
-RUN \
-    wget -qq -O /usr/local/bin/mhsendmail https://github.com/mailhog/mhsendmail/releases/download/${MHSENDMAIL_VERSION}/mhsendmail_linux_amd64 && \
-    chmod +x /usr/local/bin/mhsendmail && \
-    which mhsendmail
 
 # wkhtmltopdf
 RUN \
@@ -114,7 +115,6 @@ RUN \
 
 RUN \
     chown -R 1000:1000 /home/www/
-
 CMD ["/usr/local/sbin/php-fpm"]
 
 FROM stage2 as stage3
