@@ -12,7 +12,7 @@ RUN chmod +x /usr/local/bin/install-php-extensions && sync && \
     # disable xdebug by default, only enable in fpm by mounting ini file.
     rm -f /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini && \
     mkdir -p /home/www/.composer && \
-    chown -vR 1000:1000 /home/www/.composer
+    chown -R 1000:1000 -R /home/www/
 
 VOLUME /home/www/.composer
 
@@ -74,7 +74,7 @@ RUN \
   echo "yarn: $(yarn --version)" && \
   # echo "convert: $(convert --version)" && \
   # Allow extension enable for the user "www"
-  chown www:www -vR /usr/local/etc/php/conf.d/ && \
+  chown www:www -R /usr/local/etc/php/conf.d/ && \
   rm -rf /tmp/* /var/tmp/* /var/lib/{apt,dpkg,cache,log}/
 
 # Image optim libraries

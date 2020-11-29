@@ -1,0 +1,13 @@
+{
+    "name": "nlzet/docker-images",
+    "type": "project",
+    "license": "MIT",
+    "authors": [
+        {"name": "Niels Verbeek", "email": "niels@kreable.com"}
+    ],
+    "minimum-stability": "stable",
+    "require": {
+        "phpunit/phpunit": "^9.0",
+        "php": "^7.3|^8.0"
+    }
+}
