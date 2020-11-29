@@ -17,7 +17,7 @@ php73:
     - export PHP_EXTENSIONS="apcu apcu_bc amqp bcmath bz2 exif gd gettext gmp igbinary imagick intl mcrypt mongodb mysqli pdo_mysql pdo_pgsql redis soap ssh2 xdebug xmlrpc xsl zip"
     - docker login --username=$DOCKER_HUB_USERNAME --password=$DOCKER_HUB_PASSWORD
     - ./php/build.sh
-    - docker run -v /tmp/composercache/:/home/www/.composer/cache/ -v $(pwd)/php/test/:/var/www -it ${DOCKER_PREFIX}-cli composer install
+    - docker run -v /tmp/composercache/:/home/www/.composer/cache/ -v $(pwd)/php/test/:/var/www -i ${DOCKER_PREFIX}-cli composer install
     - ./php/test.sh
     - ./php/push.sh
   services:
@@ -34,7 +34,7 @@ php74:
     - export PHP_EXTENSIONS="apcu apcu_bc amqp bcmath bz2 exif gd gettext gmp igbinary imagick intl mcrypt mongodb mysqli pdo_mysql pdo_pgsql redis soap ssh2 xdebug xmlrpc xsl zip"
     - docker login --username=$DOCKER_HUB_USERNAME --password=$DOCKER_HUB_PASSWORD
     - ./php/build.sh
-    - docker run -v /tmp/composercache/:/home/www/.composer/cache/ -v $(pwd)/php/test/:/var/www -it ${DOCKER_PREFIX}-cli composer install
+    - docker run -v /tmp/composercache/:/home/www/.composer/cache/ -v $(pwd)/php/test/:/var/www -i ${DOCKER_PREFIX}-cli composer install
     - ./php/test.sh
     - ./php/push.sh
   services:
@@ -55,7 +55,7 @@ php80:
     # amqp apcu_bc imagick mcrypt mongodb ssh2 xmlrpc
     - docker login --username=$DOCKER_HUB_USERNAME --password=$DOCKER_HUB_PASSWORD
     - ./php/build.sh
-    - docker run -v /tmp/composercache/:/home/www/.composer/cache/ -v $(pwd)/php/test/:/var/www -it ${DOCKER_PREFIX}-cli composer install
+    - docker run -v /tmp/composercache/:/home/www/.composer/cache/ -v $(pwd)/php/test/:/var/www -i ${DOCKER_PREFIX}-cli composer install
     - ./php/test.sh
     - ./php/push.sh
   services:

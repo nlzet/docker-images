@@ -57,44 +57,46 @@ ENV DSSIM_VERSION=2.9.7
 ENV MOZJPEG_VERSION=3.3.1
 ENV PNGQUANT_VERSION=2.7.2
 ENV JPEGTRAN_VERSION=9c
+ENV MHSENDMAIL_VERSION=2.0
 
 RUN \
   curl -sL https://deb.nodesource.com/setup_12.x | bash - && \
   curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | apt-key add - && \
   echo "deb https://dl.yarnpkg.com/debian/ stable main" | tee /etc/apt/sources.list.d/yarn.list && \
   apt-get update && \
-  apt-get install -y --no-install-recommends xvfb sendmail msmtp golang-go nodejs yarn \
+  apt-get install -y --no-install-recommends xvfb nodejs yarn \
+  # todo: sendmail msmtp
+  # todo: still needed ? golang-go
   libfontconfig1 libxrender1 \
   optipng pngcrush jpegoptim gifsicle && \
   echo "node: $(node --version)" && \
   echo "npm: $(npm --version)" && \
   echo "yarn: $(yarn --version)" && \
-  # echo "convert: $(convert --version)" && \
+  # todo: echo "convert: $(convert --version)" && \
   # Allow extension enable for the user "www"
   chown www:www -R /usr/local/etc/php/conf.d/ && \
   rm -rf /tmp/* /var/tmp/* /var/lib/{apt,dpkg,cache,log}/
 
 # Image optim libraries
 RUN \
-    buildDeps='gcc libc6-dev make cmake bison' && \
-    pkgExtra='libfreetype6-dev libpng-dev zlib1g-dev libicu-dev libjpeg62-turbo-dev libjpeg-dev libjpeg62-turbo libssl-dev build-essential' && \
+    buildDeps='gcc libc6-dev make cmake build-essential' && \
+    pkgExtra='libfreetype6-dev libpng-dev zlib1g-dev libicu-dev libjpeg62-turbo-dev libjpeg-dev libjpeg62-turbo libssl-dev' && \
     set -x && \
     apt-get update && apt-get install -y $buildDeps $pkgExtra --no-install-recommends && \
-    mkdir -p /tmp/pngout && cd /tmp/pngout && wget -qq -O pngout.tar.gz http://static.jonof.id.au/dl/kenutils/pngout-20150319-linux.tar.gz && tar -xzvf pngout.tar.gz && mv pngout-20150319-linux/x86_64/pngout /usr/local/bin/pngout && which pngout && rm -Rf /tmp/pngout && \
-    mkdir -p /tmp/dssim && cd /tmp/dssim && wget -qq -O dssim.zip https://github.com/kornelski/dssim/releases/download/${DSSIM_VERSION}/dssim-${DSSIM_VERSION}.zip && unzip dssim.zip && dpkg -i ./linux/dssim_${DSSIM_VERSION}_amd64.deb && which dssim && rm -Rf /tmp/dssim && \
-    mkdir -p /tmp/mozjpeg && cd /tmp/mozjpeg && git clone --depth 1 https://github.com/mozilla/mozjpeg.git && cd mozjpeg && cmake -G"Unix Makefiles" && make && make install && rm -rf /tmp/mozjpeg && \
-    mkdir -p /tmp/pngquant && cd /tmp/pngquant && git clone -b ${PNGQUANT_VERSION} --depth 1 https://github.com/kornelski/pngquant.git . && make && make install && which pngquant && rm -rf /tmp/pngquant && \
-    mkdir -p /tmp/jpegtran && cd /tmp/jpegtran && wget -qq -O jpegtran.tar.gz http://www.ijg.org/files/jpegsrc.v${JPEGTRAN_VERSION}.tar.gz && tar -xzvf jpegtran.tar.gz && cd /tmp/jpegtran/jpeg-${JPEGTRAN_VERSION}/ && ./configure && make && make test && make install && which jpegtran && rm -Rf /tmp/jpegtran && \
+    mkdir -p /tmp/pngout && cd /tmp/pngout && wget -qq -O pngout.tar.gz http://static.jonof.id.au/dl/kenutils/pngout-20150319-linux.tar.gz && tar -xzvf pngout.tar.gz && mv pngout-20150319-linux/x86_64/pngout /usr/local/bin/pngout && which pngout&& \
+    mkdir -p /tmp/dssim && cd /tmp/dssim && wget -qq -O dssim.zip https://github.com/kornelski/dssim/releases/download/${DSSIM_VERSION}/dssim-${DSSIM_VERSION}.zip && unzip dssim.zip && dpkg -i ./linux/dssim_${DSSIM_VERSION}_amd64.deb && which dssim && \
+    mkdir -p /tmp/mozjpeg && cd /tmp/mozjpeg && git clone --depth 1 https://github.com/mozilla/mozjpeg.git && cd mozjpeg && cmake -G"Unix Makefiles" && make && make install && \
+    mkdir -p /tmp/pngquant && cd /tmp/pngquant && git clone -b ${PNGQUANT_VERSION} --depth 1 https://github.com/kornelski/pngquant.git . && make && make install && which pngquant && \
+    mkdir -p /tmp/jpegtran && cd /tmp/jpegtran && wget -qq -O jpegtran.tar.gz http://www.ijg.org/files/jpegsrc.v${JPEGTRAN_VERSION}.tar.gz && tar -xzvf jpegtran.tar.gz && cd /tmp/jpegtran/jpeg-${JPEGTRAN_VERSION}/ && ./configure && make && make test && make install && which jpegtran && \
     cd /root && \
     apt-get purge -y --auto-remove $buildDeps && \
     rm -rf /tmp/* /var/tmp/* /var/lib/{apt,dpkg,cache,log}/
 
 # Mailhog sendmail helper
 RUN \
-    go get github.com/mailhog/mhsendmail && \
-    ln -sf $(which mhsendmail) /usr/local/bin/mhsendmail && \
-    which mhsendmail && \
-    chown -R 1000:1000 /home/www/
+    wget -qq -O /usr/local/bin/mhsendmail https://github.com/mailhog/mhsendmail/releases/download/${MHSENDMAIL_VERSION}/mhsendmail_linux_amd64 && \
+    chmod +x /usr/local/bin/mhsendmail && \
+    which mhsendmail
 
 # wkhtmltopdf
 RUN \
@@ -109,6 +111,9 @@ RUN \
   wkhtmltoimage --version && \
   cd - && \
   rm -Rf wkhtmltox/
+
+RUN \
+    chown -R 1000:1000 /home/www/
 
 CMD ["/usr/local/sbin/php-fpm"]
 
