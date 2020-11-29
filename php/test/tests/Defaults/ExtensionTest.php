@@ -44,4 +44,10 @@ final class ExtensionTest extends TestCase
         // basic testing, just class usage
         $this->assertInstanceOf(Redis::class, new Redis());
     }
+
+    public function test(): void
+    {
+        // basic testing, just class usage
+        $this->assertInstanceOf(Redis::class, new Redis());
+    }
 }

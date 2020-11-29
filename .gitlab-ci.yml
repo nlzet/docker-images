@@ -17,12 +17,9 @@ php73:
     - export PHP_EXTENSIONS="apcu apcu_bc amqp bcmath bz2 exif gd gettext gmp igbinary imagick intl mcrypt mongodb mysqli pdo_mysql pdo_pgsql redis soap ssh2 xdebug xmlrpc xsl zip"
     - docker login --username=$DOCKER_HUB_USERNAME --password=$DOCKER_HUB_PASSWORD
     - ./php/build.sh
-    - cd php/test
-    - docker run -v /tmp/composercache/:/home/www/.composer/cache/ -v $(pwd):/var/www -it ${DOCKER_PREFIX}-cli composer install
-    - ./test.sh
-    - cd ..
-    - ./build.sh
-
+    - docker run -v /tmp/composercache/:/home/www/.composer/cache/ -v $(pwd)/php/test/:/var/www -it ${DOCKER_PREFIX}-cli composer install
+    - ./php/test.sh
+    - ./php/push.sh
   services:
     - name: docker:dind
       alias: docker
@@ -37,12 +34,9 @@ php74:
     - export PHP_EXTENSIONS="apcu apcu_bc amqp bcmath bz2 exif gd gettext gmp igbinary imagick intl mcrypt mongodb mysqli pdo_mysql pdo_pgsql redis soap ssh2 xdebug xmlrpc xsl zip"
     - docker login --username=$DOCKER_HUB_USERNAME --password=$DOCKER_HUB_PASSWORD
     - ./php/build.sh
-    - cd php/test
-    - docker run -v $(pwd):/var/www -it ${DOCKER_PREFIX}-cli composer install
-    - ./test.sh
-    - cd ..
-    - ./build.sh
-
+    - docker run -v /tmp/composercache/:/home/www/.composer/cache/ -v $(pwd)/php/test/:/var/www -it ${DOCKER_PREFIX}-cli composer install
+    - ./php/test.sh
+    - ./php/push.sh
   services:
     - name: docker:dind
       alias: docker
@@ -54,15 +48,16 @@ php80:
   script:
     - export DOCKER_PREFIX=nlzet/php:8.0
     - export PHP_FROM=php:8.0.0RC5-fpm
-    - export PHP_EXTENSIONS="apcu bcmath bz2 exif gd gettext gmp igbinary intl mysqli pdo_mysql pdo_pgsql redis soap xdebug xsl zip"
-    # unsupported php8 modules
+    - export PHP_EXTENSIONS="gd"
+    # tmp disabled
+    # apcu bcmath bz2 exif gd gettext gmp igbinary intl mysqli pdo_mysql pdo_pgsql redis soap xdebug xsl zip
+    # unsupported php8 extensions
+    # amqp apcu_bc imagick mcrypt mongodb ssh2 xmlrpc
     - docker login --username=$DOCKER_HUB_USERNAME --password=$DOCKER_HUB_PASSWORD
     - ./php/build.sh
-    - cd php/test
-    - docker run -v $(pwd):/var/www -it ${DOCKER_PREFIX}-cli composer install
-    - ./test.sh
-    - cd ..
-    - ./build.sh
+    - docker run -v /tmp/composercache/:/home/www/.composer/cache/ -v $(pwd)/php/test/:/var/www -it ${DOCKER_PREFIX}-cli composer install
+    - ./php/test.sh
+    - ./php/push.sh
   services:
     - name: docker:dind
       alias: docker

@@ -30,12 +30,11 @@ RUN \
   echo "en_US.UTF-8 UTF-8" >> /etc/locale.gen && \
   echo "nl_NL.UTF-8 UTF-8" >> /etc/locale.gen && \
   apt-get update && \
-  apt-get install -y tree locales git-core curl wget openssl unzip telnet rsync ssh-client zip && \
+  apt-get install -y locales git-core curl wget openssl unzip telnet rsync ssh-client zip && \
   locale-gen && \
   apt-get -y clean && \
   apt-get -y autoclean && \
-  rm -rf /tmp/* /var/tmp/* /var/lib/{apt,dpkg,cache,log}/ && \
-  tree -L 8 / > /tmp/stage0.txt
+  rm -rf /tmp/* /var/tmp/* /var/lib/{apt,dpkg,cache,log}/
 
 ENV TERM xterm
 VOLUME /app
@@ -45,8 +44,6 @@ FROM init-stage as stage1
 
 USER www
 ENV TERM xterm
-
-RUN tree -L 8 / > /tmp/stage1.txt
 
 FROM stage1 as stage2
 
@@ -115,8 +112,6 @@ RUN \
 
 CMD ["/usr/local/sbin/php-fpm"]
 
-RUN tree -L 8 / > /tmp/stage2.txt
-
 FROM stage2 as stage3
 
 RUN \
@@ -133,5 +128,3 @@ RUN yarn global add @quasar/cli @vue/cli cypress @api-platform/client-generator 
   rm -rf /tmp/* /var/tmp/* /var/lib/{apt,dpkg,cache,log}/
 
 CMD ["php", "-a"]
-
-RUN tree -L 8 / > /tmp/stage3.txt

@@ -5,9 +5,18 @@
     "authors": [
         {"name": "Niels Verbeek", "email": "niels@kreable.com"}
     ],
+    "config": {
+        "sort-packages": true
+    },
+    "autoload": {
+        "psr-4": {
+            "Nlzet\\DockerImages\\": "src"
+        }
+    },
     "minimum-stability": "stable",
     "require": {
+        "php": "^7.3|^8.0",
         "phpunit/phpunit": "^9.0",
-        "php": "^7.3|^8.0"
+        "ps/image-optimizer": "^2.0"
     }
 }
