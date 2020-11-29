@@ -11,10 +11,9 @@ echo " "
 echo "FROM_IMAGE: ${FROM_IMAGE}"
 echo "DOCKER_PREFIX: ${DOCKER_PREFIX}"
 echo "PHP_EXTENSIONS: ${PHP_EXTENSIONS}"
-echo " "
-echo "docker tag prefixes:"
-echo "${DOCKER_TAG}"
-echo "${DOCKER_TAG_MINOR}"
+echo "PHP_MINOR_VERSION: ${PHP_MINOR_VERSION}"
+echo "DOCKER_TAG: ${DOCKER_TAG}"
+echo "DOCKER_TAG_MINOR: ${DOCKER_TAG_MINOR}"
 echo " "
 
 docker push ${DOCKER_TAG}-cli
