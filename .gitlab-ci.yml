@@ -37,7 +37,9 @@ php80:
   script:
     - export DOCKER_PREFIX=nlzet/php:8.0
     - export PHP_FROM=php:8.0.0RC5-fpm
-    - export PHP_EXTENSIONS="gd xdebug intl xmlrpc xsl gettext gmp bcmath zip bz2 soap mysqli pdo_mysql pdo_pgsql mongodb amqp imagick igbinary ssh2 exif mcrypt redis"
+    - export PHP_EXTENSIONS="gd xdebug intl xsl gettext gmp bcmath zip bz2 soap mysqli pdo_mysql pdo_pgsql mongodb amqp imagick igbinary ssh2 exif mcrypt redis"
+    # unsupported php8 modules
+    # xmlrpc
     - docker login --username=$DOCKER_HUB_USERNAME --password=$DOCKER_HUB_PASSWORD
     - ./php/build.sh
   services:
