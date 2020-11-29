@@ -1,4 +1,4 @@
-#!/usr/bin/env sh
+#!/usr/bin/env bash
 
 OUTPUT=$(docker run -i ${FROM_IMAGE} php -v)
 PHP_MINOR_VERSION=$(echo $OUTPUT | grep -Po -i "^PHP (\d\.\d\.\d+)" | cut -d " " -f2 | cut -d "." -f3)

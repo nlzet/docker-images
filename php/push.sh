@@ -1,4 +1,4 @@
-#!/usr/bin/env sh
+#!/usr/bin/env bash
 
 OUTPUT=$(docker run -i ${FROM_IMAGE} php -v)
 echo $OUTPUT
