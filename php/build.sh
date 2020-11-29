@@ -1,8 +1,7 @@
 #!/usr/bin/env sh
 
 OUTPUT=$(docker run -i ${FROM_IMAGE} php -v)
-PHP_MINOR_VERSION=$(echo $OUTPUT | grep -Po -i "^PHP (\d\.\d\.\d+)" | cut -d " " -f2 | cut -d "." -f3)
-
+PHP_MINOR_VERSION=$(echo $OUTPUT | cut -d " " -f2 | cut -d " " -f1 | cut -d "." -f3)
 DOCKER_TAG="${DOCKER_PREFIX}"
 DOCKER_TAG_MINOR="${DOCKER_PREFIX}.${PHP_MINOR_VERSION}"
 
