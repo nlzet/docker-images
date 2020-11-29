@@ -1,20 +1,28 @@
 #!/bin/bash
-DIR="$( cd "$(dirname "$0")" >/dev/null 2>&1 ; pwd -P )"
-cd -
-echo $DIR
+
+echo " "
+echo "config:"
+echo " "
+echo "FROM_IMAGE: ${FROM_IMAGE}"
+echo "DOCKER_PREFIX: ${DOCKER_PREFIX}"
+echo "PHP_EXTENSIONS: ${PHP_EXTENSIONS}"
+echo " "
+echo "used test image:"
+echo "${DOCKER_PREFIX}-ci"
+echo " "
 
 docker run \
-  -v ${DIR}/test/config/php.ini:/usr/local/etc/php/conf.d/zz-override.ini \
+  -v $(pwd)/php/test/config/php.ini:/usr/local/etc/php/conf.d/zz-override.ini \
   -v ~/.composer:/home/www/.composer \
-  -v ${DIR}/test/:/var/www \
+  -v $(pwd)/php/test/:/var/www \
   -i \
   ${DOCKER_PREFIX}-ci \
   php /var/www/vendor/bin/phpunit --testsuite defaults
 
 docker run \
-  -v ${DIR}/test/config/php.ini:/usr/local/etc/php/conf.d/zz-override.ini \
+  -v $(pwd)/php/test/config/php.ini:/usr/local/etc/php/conf.d/zz-override.ini \
   -v ~/.composer:/home/www/.composer \
-  -v ${DIR}/test/:/var/www \
+  -v $(pwd)/php/test/:/var/www \
   -e XDEBUG_MODE=coverage \
   -i \
   ${DOCKER_PREFIX}-ci \
