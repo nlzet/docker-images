@@ -16,7 +16,7 @@ php73:
     - export PHP_FROM=php:7.3-fpm
     - export PHP_EXTENSIONS="apcu apcu_bc amqp bcmath bz2 exif gd gettext gmp igbinary imagick intl mcrypt mongodb mysqli pdo_mysql pdo_pgsql redis soap ssh2 xdebug xmlrpc xsl zip"
     - docker login --username=$DOCKER_HUB_USERNAME --password=$DOCKER_HUB_PASSWORD
-    - ./php/build.sh
+#    - ./php/build.sh
     - docker run -v /tmp/composercache/:/home/www/.composer/cache/ -v $(pwd)/php/test/:/var/www -i ${DOCKER_PREFIX}-cli composer install
     - ./php/test.sh
     - ./php/push.sh
@@ -24,22 +24,22 @@ php73:
     - name: docker:dind
       alias: docker
 
-php74:
-  tags: ["docker"]
-  stage: build
-  image: docker
-  script:
-    - export DOCKER_PREFIX=nlzet/php:7.4
-    - export PHP_FROM=php:7.4-fpm
-    - export PHP_EXTENSIONS="apcu apcu_bc amqp bcmath bz2 exif gd gettext gmp igbinary imagick intl mcrypt mongodb mysqli pdo_mysql pdo_pgsql redis soap ssh2 xdebug xmlrpc xsl zip"
-    - docker login --username=$DOCKER_HUB_USERNAME --password=$DOCKER_HUB_PASSWORD
-    - ./php/build.sh
-    - docker run -v /tmp/composercache/:/home/www/.composer/cache/ -v $(pwd)/php/test/:/var/www -i ${DOCKER_PREFIX}-cli composer install
-    - ./php/test.sh
-    - ./php/push.sh
-  services:
-    - name: docker:dind
-      alias: docker
+#php74:
+#  tags: ["docker"]
+#  stage: build
+#  image: docker
+#  script:
+#    - export DOCKER_PREFIX=nlzet/php:7.4
+#    - export PHP_FROM=php:7.4-fpm
+#    - export PHP_EXTENSIONS="apcu apcu_bc amqp bcmath bz2 exif gd gettext gmp igbinary imagick intl mcrypt mongodb mysqli pdo_mysql pdo_pgsql redis soap ssh2 xdebug xmlrpc xsl zip"
+#    - docker login --username=$DOCKER_HUB_USERNAME --password=$DOCKER_HUB_PASSWORD
+#    - ./php/build.sh
+#    - docker run -v /tmp/composercache/:/home/www/.composer/cache/ -v $(pwd)/php/test/:/var/www -i ${DOCKER_PREFIX}-cli composer install
+#    - ./php/test.sh
+#    - ./php/push.sh
+#  services:
+#    - name: docker:dind
+#      alias: docker
 
 php80:
   tags: ["docker"]
@@ -56,7 +56,7 @@ php80:
     - docker login --username=$DOCKER_HUB_USERNAME --password=$DOCKER_HUB_PASSWORD
     - ./php/build.sh
     - docker run -v /tmp/composercache/:/home/www/.composer/cache/ -v $(pwd)/php/test/:/var/www -i ${DOCKER_PREFIX}-cli composer install
-    - ./php/test.sh
+#    - ./php/test.sh
     - ./php/push.sh
   services:
     - name: docker:dind
