@@ -128,7 +128,7 @@ RUN \
 
 USER www
 ENV PATH="${PATH}:/home/www/.yarn/bin/"
-RUN yarn global add @quasar/cli @vue/cli cypress @api-platform/client-generator && \
+RUN yarn global add cypress @api-platform/client-generator && \
   yarn cache clean && \
   rm -rf /tmp/* /var/tmp/* /var/lib/{apt,dpkg,cache,log}/
 
