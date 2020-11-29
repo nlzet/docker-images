@@ -37,7 +37,6 @@ RUN \
   rm -rf /tmp/* /var/tmp/* /var/lib/{apt,dpkg,cache,log}/ && \
   tree -L 8 / > /tmp/stage0.txt
 
-
 ENV TERM xterm
 VOLUME /app
 WORKDIR /var/www
@@ -129,7 +128,8 @@ RUN \
 
 USER www
 ENV PATH="${PATH}:/home/www/.yarn/bin/"
-RUN yarn global add @quasar/cli @vue/cli cypress pm2 @api-platform/client-generator eslint jshint tslint && \
-  yarn cache clean
+RUN yarn global add @quasar/cli @vue/cli cypress @api-platform/client-generator && \
+  yarn cache clean && \
+  rm -rf /tmp/* /var/tmp/* /var/lib/{apt,dpkg,cache,log}/
 
 RUN tree -L 8 / > /tmp/stage3.txt
