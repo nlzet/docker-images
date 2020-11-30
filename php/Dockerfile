@@ -59,22 +59,6 @@ RUN \
     chmod +x /usr/local/bin/mhsendmail && \
     which mhsendmail
 
-# node/yarn/apt
-RUN \
-  curl -sL https://deb.nodesource.com/setup_12.x | bash - && \
-  curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | apt-key add - && \
-  echo "deb https://dl.yarnpkg.com/debian/ stable main" | tee /etc/apt/sources.list.d/yarn.list && \
-  apt-get update && \
-  # todo: sendmail msmtp
-  # todo: still needed ? golang-go && \
-  apt-get install -y --no-install-recommends xvfb nodejs yarn && \
-  echo "node: $(node --version)" && \
-  echo "npm: $(npm --version)" && \
-  echo "yarn: $(yarn --version)" && \
-  # Allow extension enable for the user "www"
-  chown www:www -R /usr/local/etc/php/conf.d/ && \
-  rm -rf /tmp/* /var/tmp/* /var/lib/{apt,dpkg,cache,log}/
-
 # wkhtmltopdf
 RUN \
   wget -qq https://github.com/wkhtmltopdf/wkhtmltopdf/releases/download/0.12.5/wkhtmltox_0.12.5-1.buster_amd64.deb && \
@@ -107,11 +91,21 @@ RUN \
 
 FROM stage1 as stage2
 
+# node/yarn/apt
 RUN \
-    mkdir /var/run/sshd && \
-    apt-get update && \
-    apt-get install -y openssh-server --no-install-recommends && \
-    rm -rf /tmp/* /var/tmp/* /var/lib/{apt,dpkg,cache,log}
+  curl -sL https://deb.nodesource.com/setup_12.x | bash - && \
+  curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | apt-key add - && \
+  echo "deb https://dl.yarnpkg.com/debian/ stable main" | tee /etc/apt/sources.list.d/yarn.list && \
+  apt-get update && \
+  # todo: sendmail msmtp
+  apt-get install -y --no-install-recommends xvfb nodejs yarn openssh-server && \
+  echo "node: $(node --version)" && \
+  echo "npm: $(npm --version)" && \
+  echo "yarn: $(yarn --version)" && \
+  # Allow extension enable for the user "www"
+  chown www:www -R /usr/local/etc/php/conf.d/ && \
+  rm -rf /tmp/* /var/tmp/* /var/lib/{apt,dpkg,cache,log}/ && \
+  mkdir /var/run/sshd
 
 USER www
 CMD ["/usr/local/sbin/php-fpm"]
