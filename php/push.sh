@@ -17,8 +17,8 @@ echo "DOCKER_TAG_MINOR: ${DOCKER_TAG_MINOR}"
 echo " "
 
 docker push ${DOCKER_TAG}-cli
-docker push ${DOCKER_TAG_MINOR}-cli
+#docker push ${DOCKER_TAG_MINOR}-cli
 docker push ${DOCKER_TAG}-fpm
-docker push ${DOCKER_TAG_MINOR}-fpm
+#docker push ${DOCKER_TAG_MINOR}-fpm
 docker push ${DOCKER_TAG}-ci
-docker push ${DOCKER_TAG_MINOR}-ci
+#docker push ${DOCKER_TAG_MINOR}-ci
