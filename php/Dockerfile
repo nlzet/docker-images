@@ -25,19 +25,20 @@ RUN \
   groupadd -g 1000 www &&  \
   useradd -u 1000 -g 1000 -ms /bin/bash www && \
   echo "alias ll='ls -la'" >> /home/www/.bashrc && \
-  mkdir -p /app && \
+  mkdir -p /var/www && \
   echo "LANG=\"en_US.UTF-8\"" > /etc/default/locale && \
   echo "en_US.UTF-8 UTF-8" >> /etc/locale.gen && \
   echo "nl_NL.UTF-8 UTF-8" >> /etc/locale.gen && \
   apt-get update && \
-  apt-get install -y locales git-core curl wget openssl unzip telnet rsync ssh-client zip && \
+  apt-get install -y locales libssl-dev git-core imagemagick curl wget openssl unzip telnet rsync ssh-client zip && \
+  echo "convert: $(convert --version)" && \
   locale-gen && \
   apt-get -y clean && \
   apt-get -y autoclean && \
   rm -rf /tmp/* /var/tmp/* /var/lib/{apt,dpkg,cache,log}/
 
 ENV TERM xterm
-VOLUME /app
+VOLUME /var/www
 WORKDIR /var/www
 
 FROM init-stage as stage1
@@ -45,13 +46,7 @@ FROM init-stage as stage1
 USER www
 ENV TERM xterm
 
-FROM stage1 as stage2
-
-ENV PATH $PATH:/home/www/go/bin
-ENV GOPATH /home/www/go
-
 USER root
-
 ENV DEBIAN_FRONTEND noninteractive
 ENV DSSIM_VERSION=2.9.7
 ENV MOZJPEG_VERSION=3.3.1
@@ -70,25 +65,31 @@ RUN \
   curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | apt-key add - && \
   echo "deb https://dl.yarnpkg.com/debian/ stable main" | tee /etc/apt/sources.list.d/yarn.list && \
   apt-get update && \
-  apt-get install -y --no-install-recommends xvfb nodejs yarn \
   # todo: sendmail msmtp
-  # todo: still needed ? golang-go
-  libfontconfig1 libxrender1 \
-  optipng pngcrush jpegoptim gifsicle && \
+  # todo: still needed ? golang-go && \
+  apt-get install -y --no-install-recommends xvfb nodejs yarn && \
   echo "node: $(node --version)" && \
   echo "npm: $(npm --version)" && \
   echo "yarn: $(yarn --version)" && \
-  # todo: echo "convert: $(convert --version)" && \
   # Allow extension enable for the user "www"
   chown www:www -R /usr/local/etc/php/conf.d/ && \
   rm -rf /tmp/* /var/tmp/* /var/lib/{apt,dpkg,cache,log}/
 
+# wkhtmltopdf
+RUN \
+  wget -qq https://github.com/wkhtmltopdf/wkhtmltopdf/releases/download/0.12.5/wkhtmltox_0.12.5-1.buster_amd64.deb && \
+  (dpkg -i wkhtmltox_0.12.5-1.buster_amd64.deb 2>&1 || apt install -yf) && \
+  rm -f wkhtmltox_0.12.5-1.buster_amd64.deb && \
+  wkhtmltopdf --version && \
+  wkhtmltoimage --version
+
 # build extra image optim libraries
 RUN \
-    buildDeps='gcc libc6-dev make cmake build-essential' && \
-    pkgExtra='libfreetype6-dev libpng-dev zlib1g-dev libicu-dev libjpeg62-turbo-dev libjpeg-dev libjpeg62-turbo libssl-dev' && \
+    pkgDeps='gcc libc6-dev make cmake build-essential' && \
+    pkgLib='libfontconfig1 libxrender1 libfreetype6-dev libpng-dev zlib1g-dev libicu-dev libjpeg62-turbo-dev libjpeg-dev libjpeg62-turbo' && \
+    pkgExtra='optipng pngcrush jpegoptim gifsicle' && \
     set -x && \
-    apt-get update && apt-get install -y $buildDeps $pkgExtra --no-install-recommends && \
+    apt-get update && apt-get install -y $pkgDeps $pkgLib $pkgExtra --no-install-recommends && \
     mkdir -p /tmp/pngout && cd /tmp/pngout && wget -qq -O pngout.tar.gz http://static.jonof.id.au/dl/kenutils/pngout-20150319-linux.tar.gz && tar -xzvf pngout.tar.gz && mv pngout-20150319-linux/x86_64/pngout /usr/local/bin/pngout && which pngout&& \
     mkdir -p /tmp/mozjpeg && cd /tmp/mozjpeg && git clone --depth 1 https://github.com/mozilla/mozjpeg.git && cd mozjpeg && cmake -G"Unix Makefiles" && make && make install && \
     mkdir -p /tmp/pngquant && cd /tmp/pngquant && git clone -b ${PNGQUANT_VERSION} --depth 1 https://github.com/kornelski/pngquant.git . && make && make install && which pngquant && \
@@ -99,29 +100,25 @@ RUN \
     ln -sf /opt/mozjpeg/bin/cjpeg /usr/local/bin/cjpeg && \
     ln -sf /opt/mozjpeg/bin/jpegtran /usr/local/bin/jpegtran && \
     cd /root && \
-    apt-get purge -y --auto-remove $buildDeps && \
-    rm -rf /tmp/* /var/tmp/* /var/lib/{apt,dpkg,cache,log}/
-
-# wkhtmltopdf
-RUN \
-  wget -qq 'https://github.com/wkhtmltopdf/wkhtmltopdf/releases/download/0.12.4/wkhtmltox-0.12.4_linux-generic-amd64.tar.xz' && \
-  tar -xf wkhtmltox-0.12.4_linux-generic-amd64.tar.xz && \
-  rm -f wkhtmltox-0.12.4_linux-generic-amd64.tar.xz && \
-  ls -lah && \
-  cd wkhtmltox/bin && \
-  mv wkhtmltopdf /usr/local/bin/wkhtmltopdf && \
-  mv wkhtmltoimage /usr/local/bin/wkhtmltoimage && \
-  wkhtmltopdf --version && \
-  wkhtmltoimage --version && \
-  cd - && \
-  rm -Rf wkhtmltox/
-
-RUN \
+    apt-get purge -y --auto-remove $pkgDeps && \
+    rm -rf /tmp/* /var/tmp/* /var/lib/{apt,dpkg,cache,log}/ && \
+    # cleanup stage 2
     chown -R 1000:1000 /home/www/
+
+FROM stage1 as stage2
+
+RUN \
+    mkdir /var/run/sshd && \
+    apt-get update && \
+    apt-get install -y openssh-server --no-install-recommends && \
+    rm -rf /tmp/* /var/tmp/* /var/lib/{apt,dpkg,cache,log}
+
+USER www
 CMD ["/usr/local/sbin/php-fpm"]
 
 FROM stage2 as stage3
 
+USER root
 RUN \
   wget https://get.symfony.com/cli/installer -O - | bash && \
   mv ~/.symfony/bin/symfony /usr/local/bin/symfony && \

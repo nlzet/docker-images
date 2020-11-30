@@ -16,6 +16,6 @@ echo "DOCKER_TAG: ${DOCKER_TAG}"
 echo "DOCKER_TAG_MINOR: ${DOCKER_TAG_MINOR}"
 echo " "
 
-docker build --build-arg PHP_EXTENSIONS="${PHP_EXTENSIONS}" --build-arg FROM_IMAGE=${FROM_IMAGE} --target stage1 -t ${DOCKER_TAG}-cli -t ${DOCKER_TAG_MINOR}-cli php/ --pull
+docker build --build-arg PHP_EXTENSIONS="${PHP_EXTENSIONS}" --build-arg FROM_IMAGE=${FROM_IMAGE} --target stage1 -t ${DOCKER_TAG}-cli -t ${DOCKER_TAG_MINOR}-cli php/ --pull --no-cache
 docker build --build-arg PHP_EXTENSIONS="${PHP_EXTENSIONS}" --build-arg FROM_IMAGE=${FROM_IMAGE} --target stage2 -t ${DOCKER_TAG}-fpm -t ${DOCKER_TAG_MINOR}-fpm --cache-from=${DOCKER_PREFIX}-cli php/
 docker build --build-arg PHP_EXTENSIONS="${PHP_EXTENSIONS}" --build-arg FROM_IMAGE=${FROM_IMAGE} --target stage3 -t ${DOCKER_TAG}-ci -t ${DOCKER_TAG_MINOR}-ci --cache-from=${DOCKER_PREFIX}-fpm php/

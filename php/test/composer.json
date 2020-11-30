@@ -16,6 +16,7 @@
     "minimum-stability": "stable",
     "require": {
         "php": "^7.3|^8.0",
+        "knplabs/knp-snappy": "^1.2",
         "phpunit/phpunit": "^9.0",
         "ps/image-optimizer": "^2.0"
     }

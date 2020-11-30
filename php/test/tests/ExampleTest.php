@@ -1,6 +1,6 @@
 <?php declare(strict_types=1);
 
-namespace Nlzet\Tests\Defaults;
+namespace Nlzet\Tests;
 
 use Nlzet\DockerImages\Example;
 use PHPUnit\Framework\TestCase;
