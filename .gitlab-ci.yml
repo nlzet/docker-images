@@ -14,7 +14,7 @@ php7.3:
   script:
     - export DOCKER_PREFIX=nlzet/php:7.3
     - export FROM_IMAGE=php:7.3-fpm
-    - export PHP_EXTENSIONS="apcu apcu_bc amqp bcmath bz2 exif gd gettext gmp igbinary imagick intl mcrypt mongodb mysqli pdo_mysql pdo_pgsql redis sockets soap ssh2 xdebug xmlrpc xsl zip"
+    - export PHP_EXTENSIONS="amqp bcmath bz2 exif gd gettext gmp igbinary imagick intl mcrypt mongodb mysqli pdo_mysql pdo_pgsql redis sockets soap xdebug xmlrpc xsl zip"
     - docker login --username=$DOCKER_HUB_USERNAME --password=$DOCKER_HUB_PASSWORD
     - ./php/build.sh
     - docker run -v /tmp/composercache/:/home/www/.composer/cache/ -v $(pwd)/php/test/:/var/www -i ${DOCKER_PREFIX}-cli composer install
@@ -31,7 +31,7 @@ php7.4:
   script:
     - export DOCKER_PREFIX=nlzet/php:7.4
     - export FROM_IMAGE=php:7.4-fpm
-    - export PHP_EXTENSIONS="apcu apcu_bc amqp bcmath bz2 exif gd gettext gmp igbinary imagick intl mcrypt mongodb mysqli pdo_mysql pdo_pgsql redis sockets soap ssh2 xdebug xmlrpc xsl zip"
+    - export PHP_EXTENSIONS="amqp bcmath bz2 exif gd gettext gmp igbinary imagick intl mcrypt mongodb mysqli pdo_mysql pdo_pgsql redis sockets soap xdebug xmlrpc xsl zip"
     - docker login --username=$DOCKER_HUB_USERNAME --password=$DOCKER_HUB_PASSWORD
     - ./php/build.sh
     - docker run -v /tmp/composercache/:/home/www/.composer/cache/ -v $(pwd)/php/test/:/var/www -i ${DOCKER_PREFIX}-cli composer install
@@ -48,9 +48,9 @@ php8.0:
   script:
     - export DOCKER_PREFIX=nlzet/php:8.0
     - export FROM_IMAGE=php:8.0.0RC5-fpm
-    - export PHP_EXTENSIONS="gd apcu bcmath bz2 exif gd gettext gmp igbinary intl mysqli pdo_mysql pdo_pgsql redis sockets soap xdebug xsl zip"
+    - export PHP_EXTENSIONS="gd bcmath bz2 exif gd gettext gmp igbinary intl mysqli pdo_mysql pdo_pgsql redis sockets soap xdebug xsl zip"
     # currently unsupported php8 extensions (https://github.com/mlocati/docker-php-extension-installer#supported-php-extensions)
-    # amqp apcu_bc imagick mcrypt mongodb ssh2 xmlrpc
+    # amqp imagick mcrypt mongodb xmlrpc
     - docker login --username=$DOCKER_HUB_USERNAME --password=$DOCKER_HUB_PASSWORD
     - ./php/build.sh
 #    - docker run -v /tmp/composercache/:/home/www/.composer/cache/ -v $(pwd)/php/test/:/var/www -i ${DOCKER_PREFIX}-cli composer install
