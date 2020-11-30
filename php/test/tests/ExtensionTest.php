@@ -176,10 +176,7 @@ final class ExtensionTest extends TestCase
         $snappy = new Pdf('/usr/local/bin/wkhtmltopdf');
         file_put_contents($target, $snappy->getOutput('http://www.github.com'));
 
-        $finfo = finfo_open(FILEINFO_MIME_TYPE);
-        $mime = finfo_file($finfo, $target);
-        finfo_close($finfo);
-
-        $this->assertEquals('application/pdf', $mime);
+        $data = file_get_contents($target);
+        $this->assertTrue(1 === preg_match("/^%PDF-1./", $data));
     }
 }
