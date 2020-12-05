@@ -69,9 +69,9 @@ RUN \
 
 # build extra image optim libraries
 RUN \
-    pkgDeps='gcc libc6-dev make cmake build-essential' && \
+    pkgDeps='make gcc libc6-dev cmake build-essential' && \
     pkgLib='libfontconfig1 libxrender1 libfreetype6-dev libpng-dev zlib1g-dev libicu-dev libjpeg62-turbo-dev libjpeg-dev libjpeg62-turbo' && \
-    pkgExtra='optipng pngcrush jpegoptim gifsicle' && \
+    pkgExtra='make optipng pngcrush jpegoptim gifsicle' && \
     set -x && \
     apt-get update && apt-get install -y $pkgDeps $pkgLib $pkgExtra --no-install-recommends && \
     mkdir -p /tmp/pngout && cd /tmp/pngout && wget -qq -O pngout.tar.gz http://static.jonof.id.au/dl/kenutils/pngout-20150319-linux.tar.gz && tar -xzvf pngout.tar.gz && mv pngout-20150319-linux/x86_64/pngout /usr/local/bin/pngout && which pngout&& \
@@ -85,6 +85,7 @@ RUN \
     ln -sf /opt/mozjpeg/bin/jpegtran /usr/local/bin/jpegtran && \
     cd /root && \
     apt-get purge -y --auto-remove $pkgDeps && \
+    apt-get install -y $pkgExtra --no-install-recommends && \
     rm -rf /tmp/* /var/tmp/* /var/lib/{apt,dpkg,cache,log}/ && \
     # cleanup stage 2
     chown -R 1000:1000 /home/www/
