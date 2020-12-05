@@ -126,4 +126,5 @@ RUN yarn global add cypress @api-platform/client-generator && \
   yarn cache clean && \
   rm -rf /tmp/* /var/tmp/* /var/lib/{apt,dpkg,cache,log}/
 
+USER root
 CMD ["php", "-a"]
