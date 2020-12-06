@@ -22,7 +22,7 @@ php7.3:
     - ./php/build.sh
     - docker run -v /tmp/composercache/:/home/www/.composer/cache/ -v $(pwd)/php/test/:/var/www -i ${DOCKER_PREFIX}-cli composer install
     - ./php/test.sh
-    - ./php/squash.sh
+#    - ./php/squash.sh
     - ./php/push.sh
   services:
     - name: docker:dind
@@ -43,7 +43,7 @@ php7.4:
     - ./php/build.sh
     - docker run -v /tmp/composercache/:/home/www/.composer/cache/ -v $(pwd)/php/test/:/var/www -i ${DOCKER_PREFIX}-cli composer install
     - ./php/test.sh
-    - ./php/squash.sh
+#    - ./php/squash.sh
     - ./php/push.sh
   services:
     - name: docker:dind
@@ -67,7 +67,7 @@ php8.0:
     - ./php/build.sh
 #    - docker run -v /tmp/composercache/:/home/www/.composer/cache/ -v $(pwd)/php/test/:/var/www -i ${DOCKER_PREFIX}-cli composer install
 #    - ./php/test.sh
-    - ./php/squash.sh
+#    - ./php/squash.sh
     - ./php/push.sh
   services:
     - name: docker:dind
