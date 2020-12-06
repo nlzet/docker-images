@@ -9,9 +9,9 @@ squash () {
   echo " "
 
   docker image ls $1 | tail -n 1
-  docker save $1 | sudo docker-squash -o squashed.tar -t $1
-  sudo tar --delete -f squashed.tar manifest.json && sudo cat squashed.tar | docker load
-  sudo rm -f image.tar squashed.tar
+  docker save $1 | docker-squash -o squashed.tar -t $1
+  tar --delete -f squashed.tar manifest.json && cat squashed.tar | docker load
+  rm -f image.tar squashed.tar
   docker image ls $1 | tail -n 1
   echo " "
 }

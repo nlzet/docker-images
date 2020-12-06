@@ -12,6 +12,9 @@ php7.3:
   stage: build
   image: docker
   script:
+    - wget https://github.com/jwilder/docker-squash/releases/download/v0.2.0/docker-squash-linux-amd64-v0.2.0.tar.gz
+    - tar -C ./ -xzvf docker-squash-linux-amd64-v0.2.0.tar.gz
+    - chmod +x docker-squash
     - export DOCKER_PREFIX=nlzet/php:7.3
     - export FROM_IMAGE=php:7.3-fpm
     - export PHP_EXTENSIONS="amqp bcmath bz2 exif gd gettext gmp igbinary imagick intl mcrypt mongodb mysqli pdo_mysql pdo_pgsql redis sockets soap xdebug xmlrpc xsl zip"
@@ -20,7 +23,7 @@ php7.3:
 #    - docker run -v /tmp/composercache/:/home/www/.composer/cache/ -v $(pwd)/php/test/:/var/www -i ${DOCKER_PREFIX}-cli composer install
 #    - ./php/test.sh
     - ./php/squash.sh
-    - ./php/push.sh
+#    - ./php/push.sh
   services:
     - name: docker:dind
       alias: docker
@@ -30,6 +33,9 @@ php7.4:
   stage: build
   image: docker
   script:
+    - wget https://github.com/jwilder/docker-squash/releases/download/v0.2.0/docker-squash-linux-amd64-v0.2.0.tar.gz
+    - tar -C ./ -xzvf docker-squash-linux-amd64-v0.2.0.tar.gz
+    - chmod +x docker-squash
     - export DOCKER_PREFIX=nlzet/php:7.4
     - export FROM_IMAGE=php:7.4-fpm
     - export PHP_EXTENSIONS="amqp bcmath bz2 exif gd gettext gmp igbinary imagick intl mcrypt mongodb mysqli pdo_mysql pdo_pgsql redis sockets soap xdebug xmlrpc xsl zip"
@@ -38,7 +44,7 @@ php7.4:
 #    - docker run -v /tmp/composercache/:/home/www/.composer/cache/ -v $(pwd)/php/test/:/var/www -i ${DOCKER_PREFIX}-cli composer install
 #    - ./php/test.sh
     - ./php/squash.sh
-    - ./php/push.sh
+#    - ./php/push.sh
   services:
     - name: docker:dind
       alias: docker
@@ -48,6 +54,9 @@ php8.0:
   stage: build
   image: docker
   script:
+    - wget https://github.com/jwilder/docker-squash/releases/download/v0.2.0/docker-squash-linux-amd64-v0.2.0.tar.gz
+    - tar -C ./ -xzvf docker-squash-linux-amd64-v0.2.0.tar.gz
+    - chmod +x docker-squash
     - export DOCKER_PREFIX=nlzet/php:8.0
     - export FROM_IMAGE=php:8.0.0RC5-fpm
     - export PHP_EXTENSIONS="gd bcmath bz2 exif gd gettext gmp igbinary intl mysqli pdo_mysql pdo_pgsql redis sockets soap xdebug xsl zip"
@@ -58,7 +67,7 @@ php8.0:
 #    - docker run -v /tmp/composercache/:/home/www/.composer/cache/ -v $(pwd)/php/test/:/var/www -i ${DOCKER_PREFIX}-cli composer install
 #    - ./php/test.sh
     - ./php/squash.sh
-    - ./php/push.sh
+#    - ./php/push.sh
   services:
     - name: docker:dind
       alias: docker
