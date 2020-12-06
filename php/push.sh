@@ -3,7 +3,12 @@
 . ./php/env.sh
 
 pushimage () {
-  docker push $1
+  echo "#########"
+  echo "> Pushing image: $1"
+  echo "#########"
+  echo " "
+  docker image ls $1 | tail -n 1
+#  docker push $1
 }
 
 pushimage "${DOCKER_TAG}-cli"

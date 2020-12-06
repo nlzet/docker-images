@@ -16,9 +16,10 @@ php7.3:
     - export FROM_IMAGE=php:7.3-fpm
     - export PHP_EXTENSIONS="amqp bcmath bz2 exif gd gettext gmp igbinary imagick intl mcrypt mongodb mysqli pdo_mysql pdo_pgsql redis sockets soap xdebug xmlrpc xsl zip"
     - docker login --username=$DOCKER_HUB_USERNAME --password=$DOCKER_HUB_PASSWORD
-    - ./php/build.sh
-    - docker run -v /tmp/composercache/:/home/www/.composer/cache/ -v $(pwd)/php/test/:/var/www -i ${DOCKER_PREFIX}-cli composer install
-    - ./php/test.sh
+#    - ./php/build.sh
+#    - docker run -v /tmp/composercache/:/home/www/.composer/cache/ -v $(pwd)/php/test/:/var/www -i ${DOCKER_PREFIX}-cli composer install
+#    - ./php/test.sh
+    - ./php/squash.sh
     - ./php/push.sh
   services:
     - name: docker:dind
@@ -33,9 +34,10 @@ php7.4:
     - export FROM_IMAGE=php:7.4-fpm
     - export PHP_EXTENSIONS="amqp bcmath bz2 exif gd gettext gmp igbinary imagick intl mcrypt mongodb mysqli pdo_mysql pdo_pgsql redis sockets soap xdebug xmlrpc xsl zip"
     - docker login --username=$DOCKER_HUB_USERNAME --password=$DOCKER_HUB_PASSWORD
-    - ./php/build.sh
-    - docker run -v /tmp/composercache/:/home/www/.composer/cache/ -v $(pwd)/php/test/:/var/www -i ${DOCKER_PREFIX}-cli composer install
-    - ./php/test.sh
+#    - ./php/build.sh
+#    - docker run -v /tmp/composercache/:/home/www/.composer/cache/ -v $(pwd)/php/test/:/var/www -i ${DOCKER_PREFIX}-cli composer install
+#    - ./php/test.sh
+    - ./php/squash.sh
     - ./php/push.sh
   services:
     - name: docker:dind
@@ -52,9 +54,10 @@ php8.0:
     # currently unsupported php8 extensions (https://github.com/mlocati/docker-php-extension-installer#supported-php-extensions)
     # amqp imagick mcrypt mongodb xmlrpc
     - docker login --username=$DOCKER_HUB_USERNAME --password=$DOCKER_HUB_PASSWORD
-    - ./php/build.sh
+#    - ./php/build.sh
 #    - docker run -v /tmp/composercache/:/home/www/.composer/cache/ -v $(pwd)/php/test/:/var/www -i ${DOCKER_PREFIX}-cli composer install
 #    - ./php/test.sh
+    - ./php/squash.sh
     - ./php/push.sh
   services:
     - name: docker:dind

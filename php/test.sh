@@ -2,8 +2,9 @@
 
 . ./php/env.sh
 
-echo "used test image:"
-echo "${DOCKER_PREFIX}-cli"
+echo "#########"
+echo "> Testing: ${DOCKER_PREFIX}-$1"
+echo "#########"
 echo " "
 
 docker run \
