@@ -19,10 +19,10 @@ php7.3:
     - export DOCKER_PREFIX=nlzet/php
     - docker login --username=$DOCKER_HUB_USERNAME --password=$DOCKER_HUB_PASSWORD
     - ./run.sh build minimal stage0
-    - ./run.sh build cli stage1 "--cache-from=nlzet/php:${PHP_VERSION}-minimal"
-    - ./run.sh build fpm stage2 "--cache-from=nlzet/php:${PHP_VERSION}-cli"
-    - ./run.sh build ci stage3 "--cache-from=nlzet/php:${PHP_VERSION}-fpm"
-    - docker run -v /tmp/composercache/:/home/www/.composer/cache/ -v $(pwd)/php/test/:/var/www -i ${DOCKER_PREFIX}-cli composer install
+    - ./run.sh build cli stage1 "--cache-from=${DOCKER_PREFIX}:${PHP_VERSION}-minimal"
+    - ./run.sh build fpm stage2 "--cache-from=${DOCKER_PREFIX}:${PHP_VERSION}-cli"
+    - ./run.sh build ci stage3 "--cache-from=${DOCKER_PREFIX}:${PHP_VERSION}-fpm"
+    - docker run -v /tmp/composercache/:/home/www/.composer/cache/ -v $(pwd)/php/test/:/var/www -i ${DOCKER_PREFIX}:${PHP_VERSION}-cli composer install
     - ./run.sh test
     - ./run.sh push minimal
     - ./run.sh push cli
@@ -44,10 +44,10 @@ php7.4:
     - export DOCKER_PREFIX=nlzet/php
     - docker login --username=$DOCKER_HUB_USERNAME --password=$DOCKER_HUB_PASSWORD
     - ./run.sh build minimal stage0
-    - ./run.sh build cli stage1 "--cache-from=nlzet/php:${PHP_VERSION}-minimal"
-    - ./run.sh build fpm stage2 "--cache-from=nlzet/php:${PHP_VERSION}-cli"
-    - ./run.sh build ci stage3 "--cache-from=nlzet/php:${PHP_VERSION}-fpm"
-    - docker run -v /tmp/composercache/:/home/www/.composer/cache/ -v $(pwd)/php/test/:/var/www -i ${DOCKER_PREFIX}-cli composer install
+    - ./run.sh build cli stage1 "--cache-from=${DOCKER_PREFIX}:${PHP_VERSION}-minimal"
+    - ./run.sh build fpm stage2 "--cache-from=${DOCKER_PREFIX}:${PHP_VERSION}-cli"
+    - ./run.sh build ci stage3 "--cache-from=${DOCKER_PREFIX}:${PHP_VERSION}-fpm"
+    - docker run -v /tmp/composercache/:/home/www/.composer/cache/ -v $(pwd)/php/test/:/var/www -i ${DOCKER_PREFIX}:${PHP_VERSION}-cli composer install
     - ./run.sh test
     - ./run.sh push minimal
     - ./run.sh push cli
@@ -69,10 +69,10 @@ php8.0:
     - export DOCKER_PREFIX=nlzet/php
     - docker login --username=$DOCKER_HUB_USERNAME --password=$DOCKER_HUB_PASSWORD
     - ./run.sh build minimal stage0
-    - ./run.sh build cli stage1 "--cache-from=nlzet/php:${PHP_VERSION}-minimal"
-    - ./run.sh build fpm stage2 "--cache-from=nlzet/php:${PHP_VERSION}-cli"
-    - ./run.sh build ci stage3 "--cache-from=nlzet/php:${PHP_VERSION}-fpm"
-    - docker run -v /tmp/composercache/:/home/www/.composer/cache/ -v $(pwd)/php/test/:/var/www -i ${DOCKER_PREFIX}-cli composer install
+    - ./run.sh build cli stage1 "--cache-from=${DOCKER_PREFIX}:${PHP_VERSION}-minimal"
+    - ./run.sh build fpm stage2 "--cache-from=${DOCKER_PREFIX}:${PHP_VERSION}-cli"
+    - ./run.sh build ci stage3 "--cache-from=${DOCKER_PREFIX}:${PHP_VERSION}-fpm"
+    - docker run -v /tmp/composercache/:/home/www/.composer/cache/ -v $(pwd)/php/test/:/var/www -i ${DOCKER_PREFIX}:${PHP_VERSION}-cli composer install
 #    - ./run.sh test
     - ./run.sh push minimal
     - ./run.sh push cli
