@@ -71,7 +71,7 @@ RUN \
 RUN \
     pkgDeps='make gcc libc6-dev cmake build-essential' && \
     pkgLib='libfontconfig1 libxrender1 libfreetype6-dev libpng-dev zlib1g-dev libicu-dev libjpeg62-turbo-dev libjpeg-dev libjpeg62-turbo' && \
-    pkgExtra='make libXcomposite optipng pngcrush jpegoptim gifsicle' && \
+    pkgExtra='make libxcomposite1 optipng pngcrush jpegoptim gifsicle' && \
     set -x && \
     apt-get update && apt-get install -y $pkgDeps $pkgLib $pkgExtra --no-install-recommends && \
     mkdir -p /tmp/pngout && cd /tmp/pngout && wget -qq -O pngout.tar.gz http://static.jonof.id.au/dl/kenutils/pngout-20150319-linux.tar.gz && tar -xzvf pngout.tar.gz && mv pngout-20150319-linux/x86_64/pngout /usr/local/bin/pngout && which pngout&& \
@@ -86,7 +86,7 @@ RUN \
     cd /root && \
     apt-get purge -y --auto-remove $pkgDeps && \
     # make sure libs/extras stay after removing pkgDeps
-    apt-get install -y $pkgLib $pkgExtra --no-install-recommends && \
+    apt-get update && apt-get install -y $pkgLib $pkgExtra --no-install-recommends && \
     rm -rf /tmp/* /var/tmp/* /var/lib/{apt,dpkg,cache,log}/ && \
     # cleanup stage 2
     chown -R 1000:1000 /home/www/
