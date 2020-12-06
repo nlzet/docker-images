@@ -15,15 +15,19 @@ php7.3:
     - apk update && apk add tar sudo
     - wget https://github.com/jwilder/docker-squash/releases/download/v0.2.0/docker-squash-linux-amd64-v0.2.0.tar.gz
     - tar -C /usr/local/bin -xzvf docker-squash-linux-amd64-v0.2.0.tar.gz && chmod +x /usr/local/bin/docker-squash
-    - export DOCKER_PREFIX=nlzet/php:7.3
-    - export FROM_IMAGE=php:7.3-fpm
-    - export PHP_EXTENSIONS="amqp bcmath bz2 exif gd gettext gmp igbinary imagick intl mcrypt mongodb mysqli pdo_mysql pdo_pgsql redis sockets soap xdebug xmlrpc xsl zip"
+    - export PHP_VERSION=7.3
+    - export DOCKER_PREFIX=nlzet/php
     - docker login --username=$DOCKER_HUB_USERNAME --password=$DOCKER_HUB_PASSWORD
-    - ./php/build.sh
+    - ./run.sh build minimal stage0
+    - ./run.sh build cli stage1 "--cache-from=nlzet/php:${PHP_VERSION}-minimal"
+    - ./run.sh build fpm stage2 "--cache-from=nlzet/php:${PHP_VERSION}-cli"
+    - ./run.sh build ci stage3 "--cache-from=nlzet/php:${PHP_VERSION}-fpm"
     - docker run -v /tmp/composercache/:/home/www/.composer/cache/ -v $(pwd)/php/test/:/var/www -i ${DOCKER_PREFIX}-cli composer install
-    - ./php/test.sh
-#    - ./php/squash.sh
-    - ./php/push.sh
+    - ./run.sh test
+    - ./run.sh push minimal
+    - ./run.sh push cli
+    - ./run.sh push fpm
+    - ./run.sh push ci
   services:
     - name: docker:dind
       alias: docker
@@ -36,15 +40,19 @@ php7.4:
     - apk update && apk add tar sudo
     - wget https://github.com/jwilder/docker-squash/releases/download/v0.2.0/docker-squash-linux-amd64-v0.2.0.tar.gz
     - tar -C /usr/local/bin -xzvf docker-squash-linux-amd64-v0.2.0.tar.gz && chmod +x /usr/local/bin/docker-squash
-    - export DOCKER_PREFIX=nlzet/php:7.4
-    - export FROM_IMAGE=php:7.4-fpm
-    - export PHP_EXTENSIONS="amqp bcmath bz2 exif gd gettext gmp igbinary imagick intl mcrypt mongodb mysqli pdo_mysql pdo_pgsql redis sockets soap xdebug xmlrpc xsl zip"
+    - export PHP_VERSION=7.4
+    - export DOCKER_PREFIX=nlzet/php
     - docker login --username=$DOCKER_HUB_USERNAME --password=$DOCKER_HUB_PASSWORD
-    - ./php/build.sh
+    - ./run.sh build minimal stage0
+    - ./run.sh build cli stage1 "--cache-from=nlzet/php:${PHP_VERSION}-minimal"
+    - ./run.sh build fpm stage2 "--cache-from=nlzet/php:${PHP_VERSION}-cli"
+    - ./run.sh build ci stage3 "--cache-from=nlzet/php:${PHP_VERSION}-fpm"
     - docker run -v /tmp/composercache/:/home/www/.composer/cache/ -v $(pwd)/php/test/:/var/www -i ${DOCKER_PREFIX}-cli composer install
-    - ./php/test.sh
-#    - ./php/squash.sh
-    - ./php/push.sh
+    - ./run.sh test
+    - ./run.sh push minimal
+    - ./run.sh push cli
+    - ./run.sh push fpm
+    - ./run.sh push ci
   services:
     - name: docker:dind
       alias: docker
@@ -57,18 +65,20 @@ php8.0:
     - apk update && apk add tar sudo
     - wget https://github.com/jwilder/docker-squash/releases/download/v0.2.0/docker-squash-linux-amd64-v0.2.0.tar.gz
     - tar -C /usr/local/bin -xzvf docker-squash-linux-amd64-v0.2.0.tar.gz && chmod +x /usr/local/bin/docker-squash
-    - export DOCKER_PREFIX=nlzet/php:8.0
-    - export FROM_IMAGE=php:8.0.0-fpm
-#    - export PHP_EXTENSIONS="gd xdebug"
-    - export PHP_EXTENSIONS="gd bcmath bz2 exif gd gettext gmp igbinary intl mysqli pdo_mysql pdo_pgsql redis sockets soap xdebug xsl zip"
-    # currently unsupported php8 extensions (https://github.com/mlocati/docker-php-extension-installer#supported-php-extensions)
-    # amqp imagick mcrypt mongodb xmlrpc
+    - export PHP_VERSION=8.0
+    - export DOCKER_PREFIX=nlzet/php
     - docker login --username=$DOCKER_HUB_USERNAME --password=$DOCKER_HUB_PASSWORD
-    - ./php/build.sh
-#    - docker run -v /tmp/composercache/:/home/www/.composer/cache/ -v $(pwd)/php/test/:/var/www -i ${DOCKER_PREFIX}-cli composer install
-#    - ./php/test.sh
-#    - ./php/squash.sh
-    - ./php/push.sh
+    - ./run.sh build minimal stage0
+    - ./run.sh build cli stage1 "--cache-from=nlzet/php:${PHP_VERSION}-minimal"
+    - ./run.sh build fpm stage2 "--cache-from=nlzet/php:${PHP_VERSION}-cli"
+    - ./run.sh build ci stage3 "--cache-from=nlzet/php:${PHP_VERSION}-fpm"
+    - docker run -v /tmp/composercache/:/home/www/.composer/cache/ -v $(pwd)/php/test/:/var/www -i ${DOCKER_PREFIX}-cli composer install
+#    - ./run.sh test
+    - ./run.sh push minimal
+    - ./run.sh push cli
+    - ./run.sh push fpm
+    - ./run.sh push ci
+
   services:
     - name: docker:dind
       alias: docker

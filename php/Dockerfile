@@ -6,13 +6,15 @@ ARG PHP_EXTENSIONS
 
 ADD https://raw.githubusercontent.com/mlocati/docker-php-extension-installer/master/install-php-extensions /usr/local/bin/
 
-RUN chmod +x /usr/local/bin/install-php-extensions && sync && \
-    echo install-php-extensions ${PHP_EXTENSIONS} && \
-    install-php-extensions ${PHP_EXTENSIONS} && \
-    # disable xdebug by default, only enable iwith ini config.
-    rm -f /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini && \
-    mkdir -p /home/www/.composer && \
-    chown -R 1000:1000 -R /home/www/
+RUN \
+  php -v && \
+  chmod +x /usr/local/bin/install-php-extensions && sync && \
+  echo install-php-extensions ${PHP_EXTENSIONS} && \
+  install-php-extensions ${PHP_EXTENSIONS} && \
+  # disable xdebug by default, only enable iwith ini config.
+  rm -f /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini && \
+  mkdir -p /home/www/.composer && \
+  chown -R 1000:1000 -R /home/www/
 
 VOLUME /home/www/.composer
 
