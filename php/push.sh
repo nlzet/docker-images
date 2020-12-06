@@ -8,9 +8,11 @@ pushimage () {
   echo "#########"
   echo " "
   docker image ls $1 | tail -n 1
-#  docker push $1
+  docker push $1
 }
 
+pushimage "${DOCKER_TAG}-minimal"
+#pushimage "${DOCKER_TAG_MINOR}-minimal"
 pushimage "${DOCKER_TAG}-cli"
 #pushimage "${DOCKER_TAG_MINOR}-cli"
 pushimage "${DOCKER_TAG}-fpm"

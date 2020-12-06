@@ -1,6 +1,6 @@
 ARG FROM_IMAGE
 FROM composer:latest AS composer
-FROM $FROM_IMAGE as init-stage
+FROM $FROM_IMAGE as stage0
 
 ARG PHP_EXTENSIONS
 
@@ -9,7 +9,7 @@ ADD https://raw.githubusercontent.com/mlocati/docker-php-extension-installer/mas
 RUN chmod +x /usr/local/bin/install-php-extensions && sync && \
     echo install-php-extensions ${PHP_EXTENSIONS} && \
     install-php-extensions ${PHP_EXTENSIONS} && \
-    # disable xdebug by default, only enable in fpm by mounting ini file.
+    # disable xdebug by default, only enable iwith ini config.
     rm -f /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini && \
     mkdir -p /home/www/.composer && \
     chown -R 1000:1000 -R /home/www/
@@ -41,10 +41,10 @@ ENV TERM xterm
 VOLUME /var/www
 WORKDIR /var/www
 
-FROM init-stage as stage1
-
 USER www
 ENV TERM xterm
+
+FROM stage0 as stage1
 
 USER root
 ENV DEBIAN_FRONTEND noninteractive

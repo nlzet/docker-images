@@ -16,6 +16,7 @@ squash () {
   echo " "
 }
 
+squash "${DOCKER_TAG}-minimal" "${DOCKER_TAG_MINOR}-minimal"
 squash "${DOCKER_TAG}-cli" "${DOCKER_TAG_MINOR}-cli"
 squash "${DOCKER_TAG}-fpm" "${DOCKER_TAG_MINOR}-fpm"
 squash "${DOCKER_TAG}-ci" "${DOCKER_TAG_MINOR}-ci"

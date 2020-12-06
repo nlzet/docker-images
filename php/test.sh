@@ -3,7 +3,7 @@
 . ./php/env.sh
 
 echo "#########"
-echo "> Testing: ${DOCKER_PREFIX}-$1"
+echo "> Testing: ${DOCKER_PREFIX}"
 echo "#########"
 echo " "
 
