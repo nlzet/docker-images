@@ -14,7 +14,7 @@ php7.3:
   script:
     - wget https://github.com/jwilder/docker-squash/releases/download/v0.2.0/docker-squash-linux-amd64-v0.2.0.tar.gz
     - tar -C ./usr/local/bin -xzvf docker-squash-linux-amd64-v0.2.0.tar.gz
-    - chmod +x docker-squash
+    - chmod +x /usr/local/bin/docker-squash
     - export DOCKER_PREFIX=nlzet/php:7.3
     - export FROM_IMAGE=php:7.3-fpm
     - export PHP_EXTENSIONS="amqp bcmath bz2 exif gd gettext gmp igbinary imagick intl mcrypt mongodb mysqli pdo_mysql pdo_pgsql redis sockets soap xdebug xmlrpc xsl zip"
@@ -35,7 +35,7 @@ php7.4:
   script:
     - wget https://github.com/jwilder/docker-squash/releases/download/v0.2.0/docker-squash-linux-amd64-v0.2.0.tar.gz
     - tar -C ./usr/local/bin -xzvf docker-squash-linux-amd64-v0.2.0.tar.gz
-    - chmod +x docker-squash
+    - chmod +x /usr/local/bin/docker-squash
     - export DOCKER_PREFIX=nlzet/php:7.4
     - export FROM_IMAGE=php:7.4-fpm
     - export PHP_EXTENSIONS="amqp bcmath bz2 exif gd gettext gmp igbinary imagick intl mcrypt mongodb mysqli pdo_mysql pdo_pgsql redis sockets soap xdebug xmlrpc xsl zip"
@@ -56,7 +56,7 @@ php8.0:
   script:
     - wget https://github.com/jwilder/docker-squash/releases/download/v0.2.0/docker-squash-linux-amd64-v0.2.0.tar.gz
     - tar -C ./usr/local/bin -xzvf docker-squash-linux-amd64-v0.2.0.tar.gz
-    - chmod +x docker-squash
+    - chmod +x /usr/local/bin/docker-squash
     - export DOCKER_PREFIX=nlzet/php:8.0
     - export FROM_IMAGE=php:8.0.0RC5-fpm
     - export PHP_EXTENSIONS="gd bcmath bz2 exif gd gettext gmp igbinary intl mysqli pdo_mysql pdo_pgsql redis sockets soap xdebug xsl zip"
