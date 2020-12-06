@@ -55,6 +55,8 @@ php8.0:
   stage: build
   image: docker
   script:
+    - echo $PATH
+    - ls -lah /usr/
     - wget https://github.com/jwilder/docker-squash/releases/download/v0.2.0/docker-squash-linux-amd64-v0.2.0.tar.gz
     - tar -C ./usr/local/bin -xzvf docker-squash-linux-amd64-v0.2.0.tar.gz
     - chmod +x /usr/local/bin/docker-squash
