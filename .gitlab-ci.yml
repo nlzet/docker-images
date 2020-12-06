@@ -72,7 +72,7 @@ php8.0:
     - ./run.sh build cli stage1 "--cache-from=${DOCKER_PREFIX}:${PHP_VERSION}-minimal"
     - ./run.sh build fpm stage2 "--cache-from=${DOCKER_PREFIX}:${PHP_VERSION}-cli"
     - ./run.sh build ci stage3 "--cache-from=${DOCKER_PREFIX}:${PHP_VERSION}-fpm"
-    - docker run -v /tmp/composercache/:/home/www/.composer/cache/ -v $(pwd)/php/test/:/var/www -i ${DOCKER_PREFIX}:${PHP_VERSION}-cli composer install
+#    - docker run -v /tmp/composercache/:/home/www/.composer/cache/ -v $(pwd)/php/test/:/var/www -i ${DOCKER_PREFIX}:${PHP_VERSION}-cli composer install
 #    - ./run.sh test
     - ./run.sh push minimal
     - ./run.sh push cli
