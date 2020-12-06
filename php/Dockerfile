@@ -30,11 +30,10 @@ RUN \
   echo "en_US.UTF-8 UTF-8" >> /etc/locale.gen && \
   echo "nl_NL.UTF-8 UTF-8" >> /etc/locale.gen && \
   apt-get update && \
-  apt-get install -y locales libssl-dev git-core imagemagick curl wget openssl unzip telnet rsync ssh-client zip && \
+  apt-get install -y locales curl wget && \
   echo "convert: $(convert --version)" && \
   locale-gen && \
-  apt-get -y clean && \
-  apt-get -y autoclean && \
+  apt-get purge -y --auto-remove locales && \
   rm -rf /tmp/* /var/tmp/* /var/lib/{apt,dpkg,cache,log}/
 
 ENV TERM xterm
@@ -71,7 +70,7 @@ RUN \
 RUN \
     pkgDeps='make gcc libc6-dev cmake build-essential' && \
     pkgLib='libfontconfig1 libxrender1 libfreetype6-dev libpng-dev zlib1g-dev libicu-dev libjpeg62-turbo-dev libjpeg-dev libjpeg62-turbo' && \
-    pkgExtra='make optipng pngcrush jpegoptim gifsicle' && \
+    pkgExtra='make optipng pngcrush jpegoptim gifsicle libssl-dev git-core imagemagick openssl unzip telnet rsync ssh-client zip' && \
     set -x && \
     apt-get update && apt-get install -y $pkgDeps $pkgLib $pkgExtra --no-install-recommends && \
     mkdir -p /tmp/pngout && cd /tmp/pngout && wget -qq -O pngout.tar.gz http://static.jonof.id.au/dl/kenutils/pngout-20150319-linux.tar.gz && tar -xzvf pngout.tar.gz && mv pngout-20150319-linux/x86_64/pngout /usr/local/bin/pngout && which pngout&& \
