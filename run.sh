@@ -42,7 +42,7 @@ buildimage () {
   echo "#########"
   echo " "
   echo docker build --build-arg PHP_EXTENSIONS=\"${PHP_EXTENSIONS}\" --build-arg FROM_IMAGE=${FROM_IMAGE} --target $2 -t ${DOCKER_TAG}-$1 php/ $3
-#  docker build --build-arg PHP_EXTENSIONS="${PHP_EXTENSIONS}" --build-arg FROM_IMAGE=${FROM_IMAGE} --target $2 -t ${DOCKER_TAG}-$1 php/ $3
+  docker build --build-arg PHP_EXTENSIONS="${PHP_EXTENSIONS}" --build-arg FROM_IMAGE=${FROM_IMAGE} --target $2 -t ${DOCKER_TAG}-$1 php/ $3
 }
 
 testimage () {
