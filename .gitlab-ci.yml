@@ -58,7 +58,7 @@ php8.0:
     - wget https://github.com/jwilder/docker-squash/releases/download/v0.2.0/docker-squash-linux-amd64-v0.2.0.tar.gz
     - tar -C /usr/local/bin -xzvf docker-squash-linux-amd64-v0.2.0.tar.gz && chmod +x /usr/local/bin/docker-squash
     - export DOCKER_PREFIX=nlzet/php:8.0
-    - export FROM_IMAGE=php:8.0.0RC5-fpm
+    - export FROM_IMAGE=php:8.0.0-fpm
     - export PHP_EXTENSIONS="gd xdebug"
 #    - export PHP_EXTENSIONS="gd bcmath bz2 exif gd gettext gmp igbinary intl mysqli pdo_mysql pdo_pgsql redis sockets soap xdebug xsl zip"
     # currently unsupported php8 extensions (https://github.com/mlocati/docker-php-extension-installer#supported-php-extensions)
