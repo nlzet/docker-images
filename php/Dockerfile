@@ -71,7 +71,7 @@ RUN \
 RUN \
     pkgDeps='make gcc libc6-dev cmake build-essential' && \
     pkgLib='libfontconfig1 libxrender1 libfreetype6-dev libpng-dev zlib1g-dev libicu-dev libjpeg62-turbo-dev libjpeg-dev libjpeg62-turbo' && \
-    pkgExtra='make libxcomposite1 optipng pngcrush jpegoptim gifsicle' && \
+    pkgExtra='make optipng pngcrush jpegoptim gifsicle' && \
     set -x && \
     apt-get update && apt-get install -y $pkgDeps $pkgLib $pkgExtra --no-install-recommends && \
     mkdir -p /tmp/pngout && cd /tmp/pngout && wget -qq -O pngout.tar.gz http://static.jonof.id.au/dl/kenutils/pngout-20150319-linux.tar.gz && tar -xzvf pngout.tar.gz && mv pngout-20150319-linux/x86_64/pngout /usr/local/bin/pngout && which pngout&& \
@@ -115,6 +115,13 @@ CMD ["/usr/local/sbin/php-fpm"]
 FROM stage2 as stage3
 
 USER root
+
+RUN \
+    pkgLib='libgtk2.0-0 libgtk-3-0 libgbm-dev libnotify-dev libgconf-2-4 libnss3 libxss1 libasound2 libxtst6 xauth xvfb' && \
+    set -x && \
+    apt-get update && apt-get install -y $pkgLib --no-install-recommends && \
+    rm -rf /tmp/* /var/tmp/* /var/lib/{apt,dpkg,cache,log}/
+
 RUN \
   wget https://get.symfony.com/cli/installer -O - | bash && \
   mv ~/.symfony/bin/symfony /usr/local/bin/symfony && \
@@ -124,7 +131,7 @@ RUN \
 
 USER www
 ENV PATH="${PATH}:/home/www/.yarn/bin/"
-RUN yarn global add cypress @api-platform/client-generator && \
+RUN yarn global add @api-platform/client-generator && \
   yarn cache clean && \
   rm -rf /tmp/* /var/tmp/* /var/lib/{apt,dpkg,cache,log}/
 
