@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/usr/bin/env sh
 
 # configuration defaults
 PHP_VERSION=${PHP_VERSION:-7.4}
@@ -7,13 +7,13 @@ DOCKER_PREFIX=${DOCKER_PREFIX:-nlzet/php}
 prepare() {
   # configure defaults if not set
   FROM_IMAGE=${FROM_IMAGE:-php:${PHP_VERSION}-fpm}
-  if [[ "$PHP_VERSION" = 8\.* ]]; then
+
+  case "$PHP_VERSION" in
     # todo: currently unsupported php8 extensions (https://github.com/mlocati/docker-php-extension-installer#supported-php-extensions)
     # amqp imagick mcrypt mongodb xmlrpc
-    PHP_EXTENSIONS=${PHP_EXTENSIONS:-gd bcmath bz2 exif gd gettext gmp igbinary intl mysqli pdo_mysql pdo_pgsql redis sockets soap xdebug xsl zip}
-  else
-    PHP_EXTENSIONS=${PHP_EXTENSIONS:-amqp bcmath bz2 exif gd gettext gmp igbinary imagick intl mcrypt mongodb mysqli pdo_mysql pdo_pgsql redis sockets soap xdebug xmlrpc xsl zip}
-  fi
+    "8."*) PHP_EXTENSIONS=${PHP_EXTENSIONS:-gd bcmath bz2 exif gd gettext gmp igbinary intl mysqli pdo_mysql pdo_pgsql redis sockets soap xdebug xsl zip} ;;
+    *) PHP_EXTENSIONS=${PHP_EXTENSIONS:-amqp bcmath bz2 exif gd gettext gmp igbinary imagick intl mcrypt mongodb mysqli pdo_mysql pdo_pgsql redis sockets soap xdebug xmlrpc xsl zip}
+  esac
 
   # parse PHP version number
   docker pull ${FROM_IMAGE} > /dev/null 2>&1
