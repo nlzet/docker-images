@@ -31,7 +31,7 @@ RUN \
   echo "LANG=\"en_US.UTF-8\"" > /etc/default/locale && \
   echo $LOCALEGEN >> /etc/locale.gen && \
   apt-get update && \
-  apt-get install -y locales && \
+  apt-get install -y locales wget && \
   locale-gen && \
   apt-get purge -y --auto-remove locales && \
   rm -rf /tmp/* /var/tmp/* /var/lib/{apt,dpkg,cache,log}/
@@ -69,7 +69,7 @@ RUN \
 # build extra image optim libraries
 RUN \
     pkgVolatile='build-essential cmake gcc libc6-dev make libfreetype6-dev libicu-dev libjpeg-dev libjpeg62-turbo-dev libpng-dev zlib1g-dev libxrender1' && \
-    pkgPersistent='libfontconfig1 libjpeg62-turbo curl gifsicle git-core imagemagick jpegoptim libssl-dev make openssl optipng pngcrush rsync ssh-client telnet unzip wget zip' && \
+    pkgPersistent='libfontconfig1 libjpeg62-turbo curl gifsicle git-core imagemagick jpegoptim libssl-dev make openssl optipng pngcrush rsync ssh-client telnet unzip zip' && \
     set -x && \
     apt-get update && apt-get install -y $pkgVolatile $pkgPersistent --no-install-recommends && \
     echo "convert: $(convert --version)" && \
