@@ -63,6 +63,9 @@ RUN \
   wget -qq https://github.com/wkhtmltopdf/wkhtmltopdf/releases/download/0.12.5/wkhtmltox_0.12.5-1.buster_amd64.deb && \
   (dpkg -i wkhtmltox_0.12.5-1.buster_amd64.deb 2>&1 || apt install -yf) && \
   rm -f wkhtmltox_0.12.5-1.buster_amd64.deb && \
+  which wkhtmltopdf && \
+  which wkhtmltoimage && \
+  wkhtmltoimage --version && \
   wkhtmltopdf --version && \
   wkhtmltoimage --version
 
