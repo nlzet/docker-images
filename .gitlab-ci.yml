@@ -23,7 +23,7 @@ php7.3:
     - ./run.sh build fpm stage2 "--cache-from=${DOCKER_PREFIX}:${PHP_VERSION}-cli"
     - ./run.sh build ci stage3 "--cache-from=${DOCKER_PREFIX}:${PHP_VERSION}-fpm"
     - docker run -v /tmp/composercache/:/home/www/.composer/cache/ -v $(pwd)/php/test/:/var/www -i ${DOCKER_PREFIX}:${PHP_VERSION}-cli composer install
-    - ./run.sh test
+    - ./run.sh testxdebug
     - ./run.sh push minimal
     - ./run.sh push cli
     - ./run.sh push fpm
@@ -48,7 +48,7 @@ php7.4:
     - ./run.sh build fpm stage2 "--cache-from=${DOCKER_PREFIX}:${PHP_VERSION}-cli"
     - ./run.sh build ci stage3 "--cache-from=${DOCKER_PREFIX}:${PHP_VERSION}-fpm"
     - docker run -v /tmp/composercache/:/home/www/.composer/cache/ -v $(pwd)/php/test/:/var/www -i ${DOCKER_PREFIX}:${PHP_VERSION}-cli composer install
-    - ./run.sh test
+    - ./run.sh testxdebug
     - ./run.sh push minimal
     - ./run.sh push cli
     - ./run.sh push fpm
@@ -73,7 +73,7 @@ php8.0:
     - ./run.sh build fpm stage2 "--cache-from=${DOCKER_PREFIX}:${PHP_VERSION}-cli"
     - ./run.sh build ci stage3 "--cache-from=${DOCKER_PREFIX}:${PHP_VERSION}-fpm"
 #    - docker run -v /tmp/composercache/:/home/www/.composer/cache/ -v $(pwd)/php/test/:/var/www -i ${DOCKER_PREFIX}:${PHP_VERSION}-cli composer install
-#    - ./run.sh test
+#    - ./run.sh testxdebug
     - ./run.sh push minimal
     - ./run.sh push cli
     - ./run.sh push fpm

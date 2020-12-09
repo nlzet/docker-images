@@ -45,9 +45,31 @@ buildimage () {
   docker build --build-arg PHP_EXTENSIONS="${PHP_EXTENSIONS}" --build-arg FROM_IMAGE=${FROM_IMAGE} --target $2 -t ${DOCKER_TAG}-$1 php/ $3
 }
 
+testcontainer () {
+  echo "#########"
+  echo "> Testing container: $1"
+  echo "#########"
+  echo " "
+
+  docker exec -i $1 php /var/www/vendor/bin/phpunit --testsuite test
+}
+
 testimage () {
   echo "#########"
   echo "> Testing: $1"
+  echo "#########"
+  echo " "
+
+  docker run \
+    -v $(pwd)/php/test/:/var/www \
+    -i \
+    $1 \
+    php /var/www/vendor/bin/phpunit --testsuite test
+}
+
+testxdebugimage () {
+  echo "#########"
+  echo "> Testing Xdebug: $1"
   echo "#########"
   echo " "
 
@@ -94,9 +116,19 @@ case $1 in
     buildimage "$2" "$3" "${4:---pull --no-cache}"
     ;;
 
+  testcontainer)
+    prepare
+    testcontainer "$2"
+    ;;
+
   test)
     prepare
     testimage "${DOCKER_TAG}-cli"
+    ;;
+
+  testxdebug)
+    prepare
+    testxdebugimage "${DOCKER_TAG}-cli"
     ;;
 
   push)

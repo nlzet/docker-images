@@ -3,7 +3,7 @@ FROM composer:latest AS composer
 FROM $FROM_IMAGE as stage0
 
 ARG PHP_EXTENSIONS
-
+ARG LOCALEGEN="en_US.UTF-8 UTF-8\nnl_NL.UTF-8 UTF-8"
 ADD https://raw.githubusercontent.com/mlocati/docker-php-extension-installer/master/install-php-extensions /usr/local/bin/
 
 RUN \
@@ -29,10 +29,9 @@ RUN \
   echo "alias ll='ls -la'" >> /home/www/.bashrc && \
   mkdir -p /var/www && \
   echo "LANG=\"en_US.UTF-8\"" > /etc/default/locale && \
-  echo "en_US.UTF-8 UTF-8" >> /etc/locale.gen && \
-  echo "nl_NL.UTF-8 UTF-8" >> /etc/locale.gen && \
+  echo $LOCALEGEN >> /etc/locale.gen && \
   apt-get update && \
-  apt-get install -y locales curl wget && \
+  apt-get install -y locales && \
   locale-gen && \
   apt-get purge -y --auto-remove locales && \
   rm -rf /tmp/* /var/tmp/* /var/lib/{apt,dpkg,cache,log}/
@@ -69,11 +68,10 @@ RUN \
 
 # build extra image optim libraries
 RUN \
-    pkgDeps='make gcc libc6-dev cmake build-essential' && \
-    pkgLib='libfontconfig1 libxrender1 libfreetype6-dev libpng-dev zlib1g-dev libicu-dev libjpeg62-turbo-dev libjpeg-dev libjpeg62-turbo' && \
-    pkgExtra='make optipng pngcrush jpegoptim gifsicle libssl-dev git-core imagemagick openssl unzip telnet rsync ssh-client zip' && \
+    pkgVolatile='build-essential cmake gcc libc6-dev make libfreetype6-dev libicu-dev libjpeg-dev libjpeg62-turbo-dev libpng-dev zlib1g-dev libxrender1' && \
+    pkgPersistent='libfontconfig1 libjpeg62-turbo curl gifsicle git-core imagemagick jpegoptim libssl-dev make openssl optipng pngcrush rsync ssh-client telnet unzip wget zip' && \
     set -x && \
-    apt-get update && apt-get install -y $pkgDeps $pkgLib $pkgExtra --no-install-recommends && \
+    apt-get update && apt-get install -y $pkgVolatile $pkgPersistent --no-install-recommends && \
     echo "convert: $(convert --version)" && \
     mkdir -p /tmp/pngout && cd /tmp/pngout && wget -qq -O pngout.tar.gz http://static.jonof.id.au/dl/kenutils/pngout-20150319-linux.tar.gz && tar -xzvf pngout.tar.gz && mv pngout-20150319-linux/x86_64/pngout /usr/local/bin/pngout && which pngout&& \
     mkdir -p /tmp/mozjpeg && cd /tmp/mozjpeg && git clone --depth 1 https://github.com/mozilla/mozjpeg.git && cd mozjpeg && cmake -G"Unix Makefiles" && make && make install && \
@@ -85,9 +83,9 @@ RUN \
     ln -sf /opt/mozjpeg/bin/cjpeg /usr/local/bin/cjpeg && \
     ln -sf /opt/mozjpeg/bin/jpegtran /usr/local/bin/jpegtran && \
     cd /root && \
-    apt-get purge -y --auto-remove $pkgDeps && \
-    # make sure libs/extras stay after removing pkgDeps
-    apt-get update && apt-get install -y $pkgLib $pkgExtra --no-install-recommends && \
+    apt-get purge -y --auto-remove $pkgVolatile && \
+    # make sure pkgPersistent stay after auto removing
+    apt-get update && apt-get install -y $pkgPersistent --no-install-recommends && \
     rm -rf /tmp/* /var/tmp/* /var/lib/{apt,dpkg,cache,log}/ && \
     # cleanup stage 2
     chown -R 1000:1000 /home/www/

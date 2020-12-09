@@ -2,6 +2,8 @@
 
 namespace Nlzet\Tests;
 
+use ImageOptimizer\Exception\Exception as OptimizeException;
+use ImageOptimizer\OptimizerFactory;
 use Knp\Snappy\Pdf;
 use PHPUnit\Framework\TestCase;
 use Redis;
@@ -10,6 +12,50 @@ use Symfony\Component\Process\Process;
 
 final class ExtensionTest extends TestCase
 {
+    protected function fileBackup(string $filePath)
+    {
+        clearstatcache();
+        $backupFilePath = sprintf('%s.tmpbak', $filePath);
+        copy($filePath, $backupFilePath);
+    }
+
+    protected function fileRestore(string $filePath)
+    {
+        clearstatcache();
+        $backupFilePath = sprintf('%s.tmpbak', $filePath);
+        if (!file_exists($backupFilePath)) {
+            throw new \Exception(sprintf('Backup file does not exist "%s"', $backupFilePath));
+        }
+
+        @unlink($filePath);
+        @copy($backupFilePath, $filePath);
+        unlink($backupFilePath);
+    }
+
+    const OPTIMIZE_DEFAULTS = [
+        'ignore_errors'                     => false,
+        'execute_only_first_png_optimizer'  => false,
+        'execute_only_first_jpeg_optimizer' => false,
+        'optipng_options'                   => ['-clobber', '--force'],
+        'pngquant_options'                  => ['--force'/*, '--strip'*/], // todo: add --strip when installed pngquant version supports it.
+        'pngcrush_options'                  => ['-reduce', '-q', '-ow'],
+        'pngout_options'                    => ['-s3', '-q', '-y', '-c2', '-d8'],
+        'gifsicle_options'                  => ['-b', '-O5'],
+        'jpegoptim_options'                 => ['--strip-all', '-m 85'],
+        'jpegtran_options'                  => ['-optimize', '-progressive'],
+        'advpng_options'                    => ['-z', '-4', '-q'],
+        'svgo_options'                      => ['--disable=cleanupIDs'],
+        'optipng_bin' => '',
+        'pngquant_bin' => '',
+        'pngcrush_bin' => '',
+        'advpng_bin' => '',
+        'gifsicle_bin' => '',
+        'jpegoptim_bin' => '',
+        'jpegtran_bin' => '',
+        'pngout_bin' => '',
+        'custom_optimizers'                 => [],
+    ];
+
     public function testExif(): void
     {
         $fp = fopen(__DIR__.'/../data/example.jpg', 'rb');
@@ -41,6 +87,8 @@ final class ExtensionTest extends TestCase
 
     public function testImageOptimBin(): void
     {
+        // todo: advpng ?
+        // $this->assertTrue(file_exists('/usr/local/bin/advpng'));
         $this->assertTrue(file_exists('/usr/local/bin/pngquant'));
         $this->assertTrue(file_exists('/usr/local/bin/optipng'));
         $this->assertTrue(file_exists('/usr/local/bin/pngcrush'));
@@ -124,24 +172,119 @@ final class ExtensionTest extends TestCase
         $resource = imagecreatefromjpeg($fileTargetPath);
         $this->assertEquals($targetW, imagesx($resource));
         $this->assertEquals($targetH, imagesy($resource));
+
+        @unlink($fileTargetPath);
     }
 
-    public function testImageOptimizeExec()
+    public function provideImageOptimizeTests()
     {
-        $factory = new \ImageOptimizer\OptimizerFactory([
-            'ignore_errors'                     => false,
-            'execute_only_first_png_optimizer'  => false,
-            'execute_only_first_jpeg_optimizer' => false,
-        ]);
+        return [
+            [__DIR__.'/../data/sample.jpg', 'jpegoptim', ['optimizers' => ['jpegoptim']]],
+            [__DIR__.'/../data/sample.jpg', 'jpegtran', ['optimizers' => ['jpegtran']]],
+            [__DIR__.'/../data/sample.jpeg', 'jpegoptim', ['optimizers' => ['jpegoptim']]],
+            [__DIR__.'/../data/sample.jpeg', 'jpegtran', ['optimizers' => ['jpegtran']]],
+            [__DIR__.'/../data/sample.png', 'optipng', ['optimizers' => ['optipng']]],
+            [__DIR__.'/../data/sample.png', 'pngquant', ['optimizers' => ['pngquant']]],
+//            [__DIR__.'/../data/sample.png', 'advpng', ['optimizers' => ['advpng']]],
+//            [__DIR__.'/../data/sample.png', 'pngout', ['optimizers' => ['pngout']]],
+        ];
+    }
 
-        $filePath = __DIR__.'/../data/example.jpg';
+    /**
+     * @dataProvider provideImageOptimizeTests
+     */
+    public function testImageOptimizeExec(string $filePath, string $optimizerName, array $options)
+    {
+        if (!file_exists($filePath)) {
+            throw new \Exception(sprintf('Cannot find source image "%s"', $filePath));
+        }
+
+        $command = '';
+        $optimizers = [];
+        foreach (self::OPTIMIZE_DEFAULTS as $defaultKey => $defaultValue) {
+            if (!isset($options[$defaultKey])) {
+                $options[$defaultKey] = $defaultValue;
+            }
+        }
+
+        if (isset($options['optimizers'])) {
+            foreach ($options['optimizers'] as $optimizer) {
+                switch ($optimizer) {
+                    case 'optipng':
+                        $options['optipng_bin'] = $optimizers[] = '/usr/local/bin/optipng';
+                        $command = sprintf('%s %s', end($optimizers), implode(' ', $options['optipng_options'] ?? []));
+                        break;
+                    case 'pngquant':
+                        $options['pngquant_bin'] = $optimizers[] = '/usr/local/bin/pngquant';
+                        $command = sprintf('%s %s', end($optimizers), implode(' ', $options['pngquant_options'] ?? []));
+                        break;
+                    case 'pngcrush':
+                        $options['pngcrush_bin'] = $optimizers[] = '/usr/local/bin/pngcrush';
+                        $command = sprintf('%s %s', end($optimizers), implode(' ', $options['pngcrush_options'] ?? []));
+                        break;
+                    case 'advpng':
+                        $options['advpng_bin'] = $optimizers[] = '/usr/local/bin/advpng';
+                        $command = sprintf('%s %s', end($optimizers), implode(' ', $options['advpng_options'] ?? []));
+                        break;
+                    case 'gifsicle':
+                        $options['gifsicle_bin'] = $optimizers[] = '/usr/local/bin/gifsicle';
+                        $command = sprintf('%s %s', end($optimizers), implode(' ', $options['gifsicle_options'] ?? []));
+                        break;
+                    case 'jpegoptim':
+                        $options['jpegoptim_bin'] = $optimizers[] = '/usr/local/bin/jpegoptim';
+                        $command = sprintf('%s %s', end($optimizers), implode(' ', $options['jpegoptim_options'] ?? []));
+                        break;
+                    case 'jpegtran':
+                        $options['jpegtran_bin'] = $optimizers[] = '/usr/local/bin/jpegtran';
+                        $command = sprintf('%s %s', end($optimizers), implode(' ', $options['jpegtran_options'] ?? []));
+                        break;
+                    case 'pngout':
+                        $options['pngout_bin'] = $optimizers[] = '/usr/local/bin/pngout';
+                        $command = sprintf('%s %s', end($optimizers), implode(' ', $options['pngout_options'] ?? []));
+                        break;
+                    default:
+                        throw new \Exception(sprintf('Unknown optimizer "%s"', $optimizer));
+                }
+
+                $command .= ' '.$filePath;
+            }
+
+            unset($options['optimizers']);
+        }
+
+        $factory = new OptimizerFactory($options);
+
+        $this->fileBackup($filePath);
+        clearstatcache();
         $sizeBefore = filesize($filePath);
 
-        $optimizer = $factory->get();
-        $optimizer->optimize($filePath);
+        $optimizer = $factory->get($optimizerName);
+        $errorMessage = sprintf(
+            'Unsuccesfull optimize: %s (optimizers: %s). Command: %s',
+            $filePath,
+            implode(', ', $optimizers),
+            $command
+        );
+
+        try {
+            $optimizer->optimize($filePath);
+        } catch (OptimizeException $optimizeException) {
+            $this->fileRestore($filePath);
+
+            throw new \Exception($errorMessage. ': Exception: '.$optimizeException->getMessage());
+        }
 
         clearstatcache();
-        $this->assertTrue(filesize($filePath) < $sizeBefore);
+        $fileSize = filesize($filePath);
+
+        $errorMessage .= sprintf(
+            ': size before: %s, now: %s.',
+            $sizeBefore,
+            $fileSize
+        );
+        $this->assertTrue($fileSize < $sizeBefore, $errorMessage);
+
+        $this->fileRestore($filePath);
     }
 
     public function testWkHtmlToPdfBin(): void
@@ -178,5 +321,7 @@ final class ExtensionTest extends TestCase
 
         $data = file_get_contents($target);
         $this->assertTrue(1 === preg_match("/^%PDF-1./", $data));
+
+        @unlink($target);
     }
 }
