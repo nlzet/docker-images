@@ -335,7 +335,5 @@ final class ExtensionTest extends TestCase
 
         $data = file_get_contents($target);
         $this->assertTrue(1 === preg_match("/^%PDF-1./", $data));
-
-        @unlink($target);
     }
 }
