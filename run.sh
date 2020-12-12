@@ -63,10 +63,11 @@ testimage () {
   echo " "
 
   docker run \
+    -w /var/www/php/test/ \
     -v $(pwd)/:/var/www \
     -i \
     $1 \
-    php /var/www/php/test/vendor/bin/phpunit --testsuite test
+    php ./vendor/bin/phpunit --testsuite test
 }
 
 testxdebugimage () {
@@ -76,13 +77,14 @@ testxdebugimage () {
   echo " "
 
   docker run \
+    -w /var/www/php/test/ \
     -v $(pwd)/php/test/config/php.ini:/usr/local/etc/php/conf.d/zz-override.ini \
     -v ~/.composer:/home/www/.composer \
     -v $(pwd)/:/var/www \
     -e XDEBUG_MODE=coverage \
     -i \
     $1 \
-    php -d "zend_extension=xdebug.so" /var/www/php/test/vendor/bin/phpunit --coverage-html=coverage --testsuite test
+    php -d "zend_extension=xdebug.so" ./vendor/bin/phpunit --coverage-html=coverage --testsuite test
 }
 
 squashimage () {

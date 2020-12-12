@@ -23,7 +23,7 @@ start() {
   imagevar="IMAGE_$imagevar"
   imagename=$(eval echo \$$imagevar)
   
-  docker run --name $1 -d $imagename bash
+  docker run -w /var/www/php/test/ --name $1 -d $imagename bash
 }
 
 analyze() {
