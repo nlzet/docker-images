@@ -116,7 +116,7 @@ RUN \
   echo "deb https://dl.yarnpkg.com/debian/ stable main" | tee /etc/apt/sources.list.d/yarn.list && \
   apt-get update && \
   # todo: sendmail msmtp
-  apt-get install -y --no-install-recommends xvfb nodejs yarn && \
+  apt-get install -y --no-install-recommends nodejs yarn && \
   echo "node: $(node --version)" && \
   echo "npm: $(npm --version)" && \
   echo "yarn: $(yarn --version)" && \
