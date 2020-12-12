@@ -2,17 +2,15 @@
 
 # configuration defaults
 IMAGE_BASE=php:7.4-fpm
-IMAGE_MINIMAL=nlzet/php:7.4-minimal
 IMAGE_CLI=nlzet/php:7.4-cli
 IMAGE_FPM=nlzet/php:7.4-fpm
 IMAGE_CI=nlzet/php:7.4-ci
 CONTAINER_BASE=base
-CONTAINER_MINIMAL=minimal
 CONTAINER_CLI=cli
 CONTAINER_FPM=fpm
 CONTAINER_CI=ci
 
-CONTAINERS="${CONTAINER_BASE} ${CONTAINER_MINIMAL} ${CONTAINER_CLI} ${CONTAINER_FPM} ${CONTAINER_CI}"
+CONTAINERS="${CONTAINER_BASE} ${CONTAINER_CLI} ${CONTAINER_FPM} ${CONTAINER_CI}"
 
 start() {  
   numContainers=$(docker ps -a --filter "name=$1" | wc -l) > /dev/null

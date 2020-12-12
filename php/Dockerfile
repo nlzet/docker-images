@@ -15,8 +15,8 @@ ENV MHSENDMAIL_VERSION=0.2.0
 
 # build extra image optim libraries
 RUN \
-    pkgVolatile='wget build-essential cmake gcc libc6-dev git-core make libfreetype6-dev libicu-dev libjpeg-dev libjpeg62-turbo-dev libpng-dev zlib1g-dev libxrender1 libssl-dev autoconf automake libtool pkgconf nasm' && \
-    pkgPersistent='libfontconfig1 ca-certificates openssl libjpeg62-turbo make' && \
+    pkgVolatile='wget build-essential cmake gcc libc6-dev git-core make libfreetype6-dev libicu-dev libjpeg-dev libjpeg62-turbo-dev libpng-dev zlib1g-dev libxrender1 libssl-dev autoconf automake libtool pkgconf nasm xfonts-75dpi xfonts-base' && \
+    pkgPersistent='fontconfig libxext6 libfontconfig1 ca-certificates openssl libjpeg62-turbo make' && \
     set -x && \
     apt-get update && apt-get install -y $pkgVolatile $pkgPersistent --no-install-recommends
 
@@ -44,6 +44,8 @@ FROM composer:latest AS composer
 FROM $FROM_IMAGE as extensions
 ARG PHP_EXTENSIONS
 ARG LOCALEGEN
+
+ENV PKG_CLEANLIST="librabbitmq-dev libssh-dev libbz2-dev cmake libmpdec-dev libenchant-dev libffi-dev libfreetype6-dev libjpeg62-turbo-dev libpng-dev libxpm-dev libwebp-dev libgraphicsmagick1-dev libgmp-dev zlib1g-dev zlib1g-dev libgnutls28-dev libcurl4-gnutls-dev libevent-dev libicu-dev libmagickwand-dev libkrb5-dev libc-client-dev firebird-dev libib-util libicu-dev libldap2-dev libmaxminddb-dev libmcrypt-dev libmemcached-dev zlib1g-dev libsasl2-dev libicu-dev libsasl2-dev libsnappy-dev libmosquitto-dev freetds-dev libpcre3-dev unixodbc-dev libpq-dev libzstd-dev libxml2-dev libssh2-1-dev uuid-dev libxml2-dev libxslt-dev cmake gnutls-dev libzip-dev libbz2-dev zlib1g-dev libmbedtls-dev"
 
 # COPY --from=rust-builder /opt/pngquant /opt/pngquant
 # COPY --from=debian-builder /usr/local/bin/pngquant /usr/local/bin/pngquant
@@ -75,6 +77,7 @@ RUN \
     mv /usr/bin/optipng /usr/local/bin/optipng && \
     mv /usr/bin/gifsicle /usr/local/bin/gifsicle && \ 
     mv /usr/bin/pngquant /usr/local/bin/pngquant && \   
+    apt-get purge -y --auto-remove ${PKG_CLEANLIST} ${PHPIZE_DEPS} && \
     rm -rf /tmp/* /var/tmp/* /var/lib/{apt,dpkg,cache,log}/
 
 VOLUME /home/www/.composer
