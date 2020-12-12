@@ -15,6 +15,9 @@ final class ExtensionTest extends TestCase
     protected function fileBackup(string $filePath)
     {
         clearstatcache();
+        if (!file_exists($filePath)) {
+            throw new \Exception(sprintf('Cannot backup file, file does not exist "%s"', $filePath));
+        }
         $backupFilePath = sprintf('%s.tmpbak', $filePath);
         copy($filePath, $backupFilePath);
     }
@@ -87,35 +90,20 @@ final class ExtensionTest extends TestCase
 
     public function testImageOptimBin(): void
     {
-        // todo: advpng ?
-        // $this->assertTrue(file_exists('/usr/local/bin/advpng'));
         $this->assertTrue(file_exists('/usr/local/bin/pngquant'));
         $this->assertTrue(file_exists('/usr/local/bin/optipng'));
-        $this->assertTrue(file_exists('/usr/local/bin/pngcrush'));
-        $this->assertTrue(file_exists('/usr/local/bin/pngout'));
         $this->assertTrue(file_exists('/usr/local/bin/gifsicle'));
         $this->assertTrue(file_exists('/usr/local/bin/jpegoptim'));
         $this->assertTrue(file_exists('/usr/local/bin/jpegtran'));
-        $this->assertTrue(file_exists('/usr/local/bin/cjpeg'));
 
         $processChecks = [
             [
                 'cmd' => ['/usr/local/bin/pngquant', '--version'],
-                'output' => '2.7.',
+                'output' => '2.',
             ],
             [
                 'cmd' => ['/usr/local/bin/optipng', '--version'],
                 'output' => 'OptiPNG version 0.7.',
-            ],
-            [
-                'cmd' => ['/usr/local/bin/pngcrush', '-version'],
-                'output' => 'pngcrush 1.8.',
-                'catch' => true,
-            ],
-            [
-                'cmd' => ['/usr/local/bin/pngout'],
-                'output' => 'Mar 19 2015',
-                'catch' => true,
             ],
             [
                 'cmd' => ['/usr/local/bin/gifsicle', '--version'],
@@ -127,12 +115,7 @@ final class ExtensionTest extends TestCase
             ],
             [
                 'cmd' => ['/usr/local/bin/jpegtran', '-v', '--help'],
-                'output' => 'mozjpeg version 4.',
-                'catch' => true,
-            ],
-            [
-                'cmd' => ['/usr/local/bin/cjpeg', '-v', '--help'],
-                'output' => 'mozjpeg version 4.',
+                'output' => 'mozjpeg version 3.',
                 'catch' => true,
             ],
         ];
@@ -185,8 +168,6 @@ final class ExtensionTest extends TestCase
             [__DIR__.'/../data/sample.jpeg', 'jpegtran', ['optimizers' => ['jpegtran']]],
             [__DIR__.'/../data/sample.png', 'optipng', ['optimizers' => ['optipng']]],
             [__DIR__.'/../data/sample.png', 'pngquant', ['optimizers' => ['pngquant']]],
-//            [__DIR__.'/../data/sample.png', 'advpng', ['optimizers' => ['advpng']]],
-//            [__DIR__.'/../data/sample.png', 'pngout', ['optimizers' => ['pngout']]],
         ];
     }
 
@@ -222,10 +203,6 @@ final class ExtensionTest extends TestCase
                         $options['pngcrush_bin'] = $optimizers[] = '/usr/local/bin/pngcrush';
                         $command = sprintf('%s %s', end($optimizers), implode(' ', $options['pngcrush_options'] ?? []));
                         break;
-                    case 'advpng':
-                        $options['advpng_bin'] = $optimizers[] = '/usr/local/bin/advpng';
-                        $command = sprintf('%s %s', end($optimizers), implode(' ', $options['advpng_options'] ?? []));
-                        break;
                     case 'gifsicle':
                         $options['gifsicle_bin'] = $optimizers[] = '/usr/local/bin/gifsicle';
                         $command = sprintf('%s %s', end($optimizers), implode(' ', $options['gifsicle_options'] ?? []));
@@ -237,10 +214,6 @@ final class ExtensionTest extends TestCase
                     case 'jpegtran':
                         $options['jpegtran_bin'] = $optimizers[] = '/usr/local/bin/jpegtran';
                         $command = sprintf('%s %s', end($optimizers), implode(' ', $options['jpegtran_options'] ?? []));
-                        break;
-                    case 'pngout':
-                        $options['pngout_bin'] = $optimizers[] = '/usr/local/bin/pngout';
-                        $command = sprintf('%s %s', end($optimizers), implode(' ', $options['pngout_options'] ?? []));
                         break;
                     default:
                         throw new \Exception(sprintf('Unknown optimizer "%s"', $optimizer));

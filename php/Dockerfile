@@ -1,11 +1,60 @@
 ARG FROM_IMAGE
-FROM composer:latest AS composer
-FROM $FROM_IMAGE as stage0
-
 ARG PHP_EXTENSIONS
 ARG LOCALEGEN="en_US.UTF-8 UTF-8\nnl_NL.UTF-8 UTF-8"
-ADD https://raw.githubusercontent.com/mlocati/docker-php-extension-installer/master/install-php-extensions /usr/local/bin/
 
+# FROM rust:1-stretch as rust-builder
+# RUN \
+#   mkdir -p /tmp/pngquant && \
+#   cd /tmp/pngquant && \
+#   git clone  --recursive https://github.com/kornelski/pngquant.git . && \
+#   cargo build --release && \
+#   mv /tmp/pngquant/target/release/ /opt/pngquant/
+
+FROM debian:buster-slim AS debian-builder
+ENV MHSENDMAIL_VERSION=0.2.0
+
+# build extra image optim libraries
+RUN \
+    pkgVolatile='wget build-essential cmake gcc libc6-dev git-core make libfreetype6-dev libicu-dev libjpeg-dev libjpeg62-turbo-dev libpng-dev zlib1g-dev libxrender1 libssl-dev autoconf automake libtool pkgconf nasm' && \
+    pkgPersistent='libfontconfig1 ca-certificates openssl libjpeg62-turbo make' && \
+    set -x && \
+    apt-get update && apt-get install -y $pkgVolatile $pkgPersistent --no-install-recommends
+
+# Mailhog sendmail helper
+RUN \
+    wget -qq -O /usr/local/bin/mhsendmail https://github.com/mailhog/mhsendmail/releases/download/v${MHSENDMAIL_VERSION}/mhsendmail_linux_amd64 && \
+    chmod +x /usr/local/bin/mhsendmail && \
+    which mhsendmail
+
+# wkhtmltopdf
+RUN \
+  wget -qq https://github.com/wkhtmltopdf/wkhtmltopdf/releases/download/0.12.5/wkhtmltox_0.12.5-1.buster_amd64.deb && \
+  (dpkg -i wkhtmltox_0.12.5-1.buster_amd64.deb 2>&1 || apt install -yf) && \
+  rm -f wkhtmltox_0.12.5-1.buster_amd64.deb && \
+  which wkhtmltopdf && \
+  which wkhtmltoimage
+
+RUN \
+    apt update && apt install -y  && \
+    mkdir -p /tmp/mozjpeg && cd /tmp/mozjpeg && wget -qq https://github.com/mozilla/mozjpeg/archive/v3.3.1.tar.gz && tar -xzf v3.3.1.tar.gz && SRC_DIR=$(ls -t1 -d mozjpeg-* | head -n1) && cd $SRC_DIR && autoreconf -fiv && cd .. && sh $SRC_DIR/configure && make install prefix=/usr/local libdir=/etc/mozjpeg/lib64 && \
+    apt-get purge -y --auto-remove $pkgVolatile && \
+    rm -rf /tmp/* /var/tmp/* /var/lib/{apt,dpkg,cache,log}/
+
+FROM composer:latest AS composer
+FROM $FROM_IMAGE as extensions
+ARG PHP_EXTENSIONS
+ARG LOCALEGEN
+
+# COPY --from=rust-builder /opt/pngquant /opt/pngquant
+# COPY --from=debian-builder /usr/local/bin/pngquant /usr/local/bin/pngquant
+COPY --from=debian-builder /usr/local/bin/jpegtran /usr/local/bin/jpegtran
+COPY --from=debian-builder /etc/mozjpeg/lib64 /etc/mozjpeg/lib64
+COPY --from=debian-builder /usr/local/bin/mhsendmail /usr/local/bin/mhsendmail
+COPY --from=debian-builder /usr/local/bin/wkhtmltopdf /usr/local/bin/wkhtmltopdf
+COPY --from=debian-builder /usr/local/bin/wkhtmltoimage /usr/local/bin/wkhtmltoimage
+COPY --from=composer /usr/bin/composer /usr/local/bin/composer
+
+ADD https://raw.githubusercontent.com/mlocati/docker-php-extension-installer/master/install-php-extensions /usr/local/bin/
 RUN \
   php -v && \
   chmod +x /usr/local/bin/install-php-extensions && sync && \
@@ -16,12 +65,24 @@ RUN \
   mkdir -p /home/www/.composer && \
   chown -R 1000:1000 -R /home/www/
 
+# lib deps
+RUN \
+    pkgPersistent='libfontconfig1 libxrender1 imagemagick libjpeg62-turbo gifsicle jpegoptim make optipng pngcrush fontconfig libfontenc1 libxext6 xfonts-75dpi xfonts-base xfonts-encodings xfonts-utils pngquant' && \
+    set -x && \
+    apt-get update && apt-get install -y $pkgPersistent --no-install-recommends && \
+    rm -rf /tmp/* /var/tmp/* /var/lib/{apt,dpkg,cache,log}/ && \
+    mv /usr/bin/jpegoptim /usr/local/bin/jpegoptim && \
+    mv /usr/bin/optipng /usr/local/bin/optipng && \
+    mv /usr/bin/gifsicle /usr/local/bin/gifsicle && \ 
+    mv /usr/bin/pngquant /usr/local/bin/pngquant && \   
+    rm -rf /tmp/* /var/tmp/* /var/lib/{apt,dpkg,cache,log}/
+
 VOLUME /home/www/.composer
 
-COPY --from=composer /usr/bin/composer /usr/local/bin/composer
+FROM extensions as stage0
+ARG LOCALEGEN
 
 RUN \
-  chmod +x /usr/local/bin/composer && \
   echo "date.timezone=UTC" > /usr/local/etc/php/conf.d/00-default.ini && \
   echo "memory_limit=-1" > /usr/local/etc/php/php-cli.ini && \
   groupadd -g 1000 www &&  \
@@ -47,53 +108,20 @@ FROM stage0 as stage1
 
 USER root
 ENV DEBIAN_FRONTEND noninteractive
-ENV DSSIM_VERSION=2.9.7
-ENV MOZJPEG_VERSION=3.3.1
-ENV PNGQUANT_VERSION=2.7.2
-ENV MHSENDMAIL_VERSION=0.2.0
-
-# Mailhog sendmail helper
-RUN \
-    wget -qq -O /usr/local/bin/mhsendmail https://github.com/mailhog/mhsendmail/releases/download/v${MHSENDMAIL_VERSION}/mhsendmail_linux_amd64 && \
-    chmod +x /usr/local/bin/mhsendmail && \
-    which mhsendmail
-
-# wkhtmltopdf
-RUN \
-  wget -qq https://github.com/wkhtmltopdf/wkhtmltopdf/releases/download/0.12.5/wkhtmltox_0.12.5-1.buster_amd64.deb && \
-  (dpkg -i wkhtmltox_0.12.5-1.buster_amd64.deb 2>&1 || apt install -yf) && \
-  rm -f wkhtmltox_0.12.5-1.buster_amd64.deb && \
-  which wkhtmltopdf && \
-  which wkhtmltoimage && \
-  wkhtmltoimage --version && \
-  wkhtmltopdf --version && \
-  wkhtmltoimage --version
 
 # build extra image optim libraries
 RUN \
-    pkgVolatile='build-essential cmake gcc libc6-dev make libfreetype6-dev libicu-dev libjpeg-dev libjpeg62-turbo-dev libpng-dev zlib1g-dev libxrender1' && \
-    pkgPersistent='libfontconfig1 libjpeg62-turbo curl gifsicle git-core imagemagick jpegoptim libssl-dev make openssl optipng pngcrush rsync ssh-client telnet unzip zip' && \
+    pkgPersistent='libfontconfig1 imagemagick libjpeg62-turbo gifsicle jpegoptim make optipng pngcrush fontconfig libfontenc1 libxext6 xfonts-75dpi xfonts-base xfonts-encodings xfonts-utils' && \
     set -x && \
-    apt-get update && apt-get install -y $pkgVolatile $pkgPersistent --no-install-recommends && \
-    echo "convert: $(convert --version)" && \
-    mkdir -p /tmp/pngout && cd /tmp/pngout && wget -qq -O pngout.tar.gz http://static.jonof.id.au/dl/kenutils/pngout-20150319-linux.tar.gz && tar -xzvf pngout.tar.gz && mv pngout-20150319-linux/x86_64/pngout /usr/local/bin/pngout && which pngout&& \
-    mkdir -p /tmp/mozjpeg && cd /tmp/mozjpeg && git clone --depth 1 https://github.com/mozilla/mozjpeg.git && cd mozjpeg && cmake -G"Unix Makefiles" && make && make install && \
-    mkdir -p /tmp/pngquant && cd /tmp/pngquant && git clone -b ${PNGQUANT_VERSION} --depth 1 https://github.com/kornelski/pngquant.git . && make && make install && which pngquant && \
-    ln -sf /usr/bin/optipng /usr/local/bin/optipng && \
-    ln -sf /usr/bin/pngcrush /usr/local/bin/pngcrush && \
-    ln -sf /usr/bin/gifsicle /usr/local/bin/gifsicle && \
-    ln -sf /usr/bin/jpegoptim /usr/local/bin/jpegoptim && \
-    ln -sf /opt/mozjpeg/bin/cjpeg /usr/local/bin/cjpeg && \
-    ln -sf /opt/mozjpeg/bin/jpegtran /usr/local/bin/jpegtran && \
-    cd /root && \
-    apt-get purge -y --auto-remove $pkgVolatile && \
-    # make sure pkgPersistent stay after auto removing
     apt-get update && apt-get install -y $pkgPersistent --no-install-recommends && \
+    echo "convert: $(convert --version)" && \
     rm -rf /tmp/* /var/tmp/* /var/lib/{apt,dpkg,cache,log}/ && \
-    # cleanup stage 2
+    # cleanup stage 1
     chown -R 1000:1000 /home/www/
 
+USER www
 FROM stage1 as stage2
+USER root
 
 # node/yarn/apt
 RUN \
@@ -120,7 +148,7 @@ USER root
 
 RUN \
     pkgLib='chromium libgtk2.0-0 libgtk-3-0 libgbm-dev libnotify-dev libgconf-2-4 libnss3 libxss1 libasound2 libxtst6 xauth xvfb' && \
-    pkgDel='adwaita-icon-theme systemd' && \
+    pkgDel='' && \
     set -x && \
     apt-get update && apt-get install -y $pkgLib --no-install-recommends && \
     apt-get purge -y --auto-remove $pkgDel && \

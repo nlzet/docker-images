@@ -113,7 +113,7 @@ case $1 in
 
   build)
     prepare
-    buildimage "$2" "$3" "${4:---pull --no-cache}"
+    buildimage "$2" "$3" "${4:---pull}"
     ;;
 
   testcontainer)
