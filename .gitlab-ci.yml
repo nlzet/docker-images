@@ -26,6 +26,11 @@ php7.3:
     - ./run.sh push cli
     - ./run.sh push fpm
     - ./run.sh push ci
+  artifacts:
+    paths:
+      - php/test/data/out_*
+    expire_in: 7 days
+    when: always
   services:
     - name: docker:dind
       alias: docker
@@ -49,6 +54,11 @@ php7.4:
     - ./run.sh push cli
     - ./run.sh push fpm
     - ./run.sh push ci
+  artifacts:
+    paths:
+      - php/test/data/out_*
+    expire_in: 7 days
+    when: always
   services:
     - name: docker:dind
       alias: docker
@@ -72,6 +82,11 @@ php8.0:
     - ./run.sh push cli
     - ./run.sh push fpm
     - ./run.sh push ci
+  artifacts:
+    paths:
+      - php/test/data/out_*
+    expire_in: 7 days
+    when: always
   services:
     - name: docker:dind
       alias: docker

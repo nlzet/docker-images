@@ -1,5 +1,8 @@
 #!/usr/bin/env sh
 
+# print commands to output
+set -x
+
 # configuration defaults
 PHP_VERSION=${PHP_VERSION:-7.4}
 DOCKER_PREFIX=${DOCKER_PREFIX:-nlzet/php}
@@ -41,7 +44,6 @@ buildimage () {
   echo "> Building image: ${DOCKER_TAG}-$1"
   echo "#########"
   echo " "
-  echo docker build --build-arg PHP_EXTENSIONS=\"${PHP_EXTENSIONS}\" --build-arg FROM_IMAGE=${FROM_IMAGE} --target $2 -t ${DOCKER_TAG}-$1 php/ $3
   docker build --build-arg PHP_EXTENSIONS="${PHP_EXTENSIONS}" --build-arg FROM_IMAGE=${FROM_IMAGE} --target $2 -t ${DOCKER_TAG}-$1 php/ $3
 }
 
@@ -142,8 +144,8 @@ case $1 in
     ;;
 
   *)
-    echo "* "
-    echo "* invalid command"
-    echo "* "
+    echo "#########"
+    echo "> Error: unexpected run command"
+    echo "#########"
     ;;
 esac

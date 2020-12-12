@@ -12,27 +12,47 @@ use Symfony\Component\Process\Process;
 
 final class ExtensionTest extends TestCase
 {
-    protected function fileBackup(string $filePath)
+    private $name;
+
+    protected function setUp(): void
     {
+        $this->name = sprintf(
+            'php%s',
+            preg_replace('/[^a-zA-Z0-9]+/', '', PHP_VERSION)
+        );
+    }
+
+    protected function fileCopy(string $filePath, array $options)
+    {
+        if (isset($options['rename'])) {
+            $targetPath = sprintf('%s/%s', pathinfo($filePath, PATHINFO_DIRNAME), $options['rename']);
+        } elseif (isset($options['extension'])) {
+            $targetPath = sprintf('%s.%s', $filePath, $options['extension']);
+        } else {
+            throw new \Exception('Choose backup strategy rename or extension');
+        }
+
         clearstatcache();
         if (!file_exists($filePath)) {
             throw new \Exception(sprintf('Cannot backup file, file does not exist "%s"', $filePath));
         }
-        $backupFilePath = sprintf('%s.tmpbak', $filePath);
-        copy($filePath, $backupFilePath);
+
+        copy($filePath, $targetPath);
     }
 
-    protected function fileRestore(string $filePath)
+    protected function fileRestore(string $filePath, $extension = 'tmpbak', $remove = true)
     {
         clearstatcache();
-        $backupFilePath = sprintf('%s.tmpbak', $filePath);
+        $backupFilePath = sprintf('%s.%s', $filePath, $extension);
         if (!file_exists($backupFilePath)) {
             throw new \Exception(sprintf('Backup file does not exist "%s"', $backupFilePath));
         }
 
         @unlink($filePath);
         @copy($backupFilePath, $filePath);
-        unlink($backupFilePath);
+        if ($remove) {
+            unlink($backupFilePath);
+        }
     }
 
     const OPTIMIZE_DEFAULTS = [
@@ -227,7 +247,7 @@ final class ExtensionTest extends TestCase
 
         $factory = new OptimizerFactory($options);
 
-        $this->fileBackup($filePath);
+        $this->fileCopy($filePath, ['extension' => 'tmpbak']);
         clearstatcache();
         $sizeBefore = filesize($filePath);
 
@@ -249,6 +269,15 @@ final class ExtensionTest extends TestCase
 
         clearstatcache();
         $fileSize = filesize($filePath);
+
+        $this->fileCopy($filePath, [
+            'rename' => sprintf(
+                'out_%s_%s_%s',
+                $this->name,
+                $optimizerName,
+                pathinfo($filePath, PATHINFO_BASENAME)
+            )
+        ]);
 
         $errorMessage .= sprintf(
             ': size before: %s, now: %s.',
@@ -288,9 +317,21 @@ final class ExtensionTest extends TestCase
 
     public function testWkHtmlToPdfExec(): void
     {
-        $target = __DIR__.'/../data/test.pdf';
+        $target = __DIR__.sprintf('/../data/out_%s_wkhtmltopdf_fromhtml.pdf', $this->name);
         $snappy = new Pdf('/usr/local/bin/wkhtmltopdf');
-        file_put_contents($target, $snappy->getOutput('http://www.github.com'));
+        $input = file_get_contents(__DIR__.'/../data/template.html');
+        file_put_contents($target, $snappy->getOutputFromHtml($input, [
+            'encoding'                => 'utf-8',
+            'dpi'                     => 300,
+            'enable-external-links'   => true,
+            'enable-internal-links'   => true,
+            'page-size'               => 'A4',
+            'disable-smart-shrinking' => true,
+            'margin-bottom'           => 0,
+            'margin-right'            => 0,
+            'margin-top'              => 0,
+            'margin-left'             => 0,
+        ]));
 
         $data = file_get_contents($target);
         $this->assertTrue(1 === preg_match("/^%PDF-1./", $data));

@@ -15,30 +15,22 @@ ENV MHSENDMAIL_VERSION=0.2.0
 
 # build extra image optim libraries
 RUN \
-    pkgVolatile='wget build-essential cmake gcc libc6-dev git-core make libfreetype6-dev libicu-dev libjpeg-dev libjpeg62-turbo-dev libpng-dev zlib1g-dev libxrender1 libssl-dev autoconf automake libtool pkgconf nasm xfonts-75dpi xfonts-base' && \
-    pkgPersistent='fontconfig libxext6 libfontconfig1 ca-certificates openssl libjpeg62-turbo make' && \
-    set -x && \
-    apt-get update && apt-get install -y $pkgVolatile $pkgPersistent --no-install-recommends
+  pkgVolatile='wget build-essential cmake gcc libc6-dev git-core make libfreetype6-dev libicu-dev libjpeg-dev libjpeg62-turbo-dev libpng-dev zlib1g-dev libxrender1 libssl-dev autoconf automake libtool pkgconf nasm xfonts-75dpi xfonts-base' && \
+  pkgPersistent='fontconfig libxext6 libfontconfig1 ca-certificates openssl libjpeg62-turbo make' && \
+  set -x && \
+  apt-get update && apt-get install -y $pkgVolatile $pkgPersistent --no-install-recommends
 
 # Mailhog sendmail helper
 RUN \
-    wget -qq -O /usr/local/bin/mhsendmail https://github.com/mailhog/mhsendmail/releases/download/v${MHSENDMAIL_VERSION}/mhsendmail_linux_amd64 && \
-    chmod +x /usr/local/bin/mhsendmail && \
-    which mhsendmail
-
-# wkhtmltopdf
-RUN \
-  wget -qq https://github.com/wkhtmltopdf/wkhtmltopdf/releases/download/0.12.5/wkhtmltox_0.12.5-1.buster_amd64.deb && \
-  (dpkg -i wkhtmltox_0.12.5-1.buster_amd64.deb 2>&1 || apt install -yf) && \
-  rm -f wkhtmltox_0.12.5-1.buster_amd64.deb && \
-  which wkhtmltopdf && \
-  which wkhtmltoimage
+  wget -qq -O /usr/local/bin/mhsendmail https://github.com/mailhog/mhsendmail/releases/download/v${MHSENDMAIL_VERSION}/mhsendmail_linux_amd64 && \
+  chmod +x /usr/local/bin/mhsendmail && \
+  which mhsendmail
 
 RUN \
-    apt update && apt install -y  && \
-    mkdir -p /tmp/mozjpeg && cd /tmp/mozjpeg && wget -qq https://github.com/mozilla/mozjpeg/archive/v3.3.1.tar.gz && tar -xzf v3.3.1.tar.gz && SRC_DIR=$(ls -t1 -d mozjpeg-* | head -n1) && cd $SRC_DIR && autoreconf -fiv && cd .. && sh $SRC_DIR/configure && make install prefix=/usr/local libdir=/etc/mozjpeg/lib64 && \
-    apt-get purge -y --auto-remove $pkgVolatile && \
-    rm -rf /tmp/* /var/tmp/* /var/lib/{apt,dpkg,cache,log}/
+  apt update && apt install -y  && \
+  mkdir -p /tmp/mozjpeg && cd /tmp/mozjpeg && wget -qq https://github.com/mozilla/mozjpeg/archive/v3.3.1.tar.gz && tar -xzf v3.3.1.tar.gz && SRC_DIR=$(ls -t1 -d mozjpeg-* | head -n1) && cd $SRC_DIR && autoreconf -fiv && cd .. && sh $SRC_DIR/configure && make install prefix=/usr/local libdir=/etc/mozjpeg/lib64 && \
+  apt-get purge -y --auto-remove $pkgVolatile && \
+  rm -rf /tmp/* /var/tmp/* /var/lib/{apt,dpkg,cache,log}/
 
 FROM composer:latest AS composer
 FROM $FROM_IMAGE as extensions
@@ -52,8 +44,6 @@ ENV PKG_CLEANLIST="librabbitmq-dev libssh-dev libbz2-dev cmake libmpdec-dev libe
 COPY --from=debian-builder /usr/local/bin/jpegtran /usr/local/bin/jpegtran
 COPY --from=debian-builder /etc/mozjpeg/lib64 /etc/mozjpeg/lib64
 COPY --from=debian-builder /usr/local/bin/mhsendmail /usr/local/bin/mhsendmail
-COPY --from=debian-builder /usr/local/bin/wkhtmltopdf /usr/local/bin/wkhtmltopdf
-COPY --from=debian-builder /usr/local/bin/wkhtmltoimage /usr/local/bin/wkhtmltoimage
 COPY --from=composer /usr/bin/composer /usr/local/bin/composer
 
 ADD https://raw.githubusercontent.com/mlocati/docker-php-extension-installer/master/install-php-extensions /usr/local/bin/
@@ -62,24 +52,26 @@ RUN \
   chmod +x /usr/local/bin/install-php-extensions && sync && \
   echo install-php-extensions ${PHP_EXTENSIONS} && \
   install-php-extensions ${PHP_EXTENSIONS} && \
-  # disable xdebug by default, only enable iwith ini config.
   rm -f /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini && \
   mkdir -p /home/www/.composer && \
-  chown -R 1000:1000 -R /home/www/
-
-# lib deps
+  chown -R 1000:1000 -R /home/www/ && \
+  pkgPersistent='ca-certificates curl fontconfig fontconfig gifsicle imagemagick jpegoptim libfontconfig1 libfontenc1 libjpeg62-turbo libjpeg62-turbo libxext6 libxext6 libxrender1 make make openssl optipng pngcrush pngquant wget xfonts-75dpi xfonts-base xfonts-encodings xfonts-utils' && \
+  set -x && \
+  apt-get update && apt-get install -y $pkgPersistent --no-install-recommends
 RUN \
-    pkgPersistent='libfontconfig1 libxrender1 imagemagick libjpeg62-turbo gifsicle jpegoptim make optipng pngcrush fontconfig libfontenc1 libxext6 xfonts-75dpi xfonts-base xfonts-encodings xfonts-utils pngquant' && \
-    set -x && \
-    apt-get update && apt-get install -y $pkgPersistent --no-install-recommends && \
-    rm -rf /tmp/* /var/tmp/* /var/lib/{apt,dpkg,cache,log}/ && \
-    mv /usr/bin/jpegoptim /usr/local/bin/jpegoptim && \
-    mv /usr/bin/optipng /usr/local/bin/optipng && \
-    mv /usr/bin/gifsicle /usr/local/bin/gifsicle && \ 
-    mv /usr/bin/pngquant /usr/local/bin/pngquant && \   
-    apt-get purge -y --auto-remove ${PKG_CLEANLIST} ${PHPIZE_DEPS} && \
-    rm -rf /tmp/* /var/tmp/* /var/lib/{apt,dpkg,cache,log}/
-
+  wget -qq https://github.com/wkhtmltopdf/wkhtmltopdf/releases/download/0.12.5/wkhtmltox_0.12.5-1.buster_amd64.deb && \
+  (dpkg -i wkhtmltox_0.12.5-1.buster_amd64.deb 2>&1 || apt install -yf) && \
+  rm -f wkhtmltox_0.12.5-1.buster_amd64.deb && \
+  rm -rf /tmp/* /var/tmp/* /var/lib/{apt,dpkg,cache,log}/ && \
+  ln -sf /usr/bin/jpegoptim /usr/local/bin/jpegoptim && \
+  ln -sf /usr/bin/optipng /usr/local/bin/optipng && \
+  ln -sf /usr/bin/gifsicle /usr/local/bin/gifsicle && \ 
+  ln -sf /usr/bin/pngquant /usr/local/bin/pngquant
+RUN \
+  wkhtmltopdf --version && \
+  wkhtmltoimage --version && \ 
+  apt-get purge -y --auto-remove ${PKG_CLEANLIST} ${PHPIZE_DEPS} && \
+  rm -rf /tmp/* /var/tmp/* /var/lib/{apt,dpkg,cache,log}/
 VOLUME /home/www/.composer
 
 FROM extensions as stage0
@@ -133,7 +125,7 @@ RUN \
   echo "deb https://dl.yarnpkg.com/debian/ stable main" | tee /etc/apt/sources.list.d/yarn.list && \
   apt-get update && \
   # todo: sendmail msmtp
-  apt-get install -y --no-install-recommends xvfb nodejs yarn openssh-server && \
+  apt-get install -y --no-install-recommends xvfb nodejs yarn && \
   echo "node: $(node --version)" && \
   echo "npm: $(npm --version)" && \
   echo "yarn: $(yarn --version)" && \

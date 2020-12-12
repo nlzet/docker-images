@@ -4,3 +4,4 @@ vendor/
 # ignore composer.lock, let each php version compile dependencies in CI
 composer.lock
 coverage
+/data/out_*
