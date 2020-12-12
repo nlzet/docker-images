@@ -53,7 +53,7 @@ testcontainer () {
   echo "#########"
   echo " "
 
-  docker exec -i $1 php /var/www/vendor/bin/phpunit --testsuite test
+  docker exec -i $1 php /var/www/php/test/vendor/bin/phpunit --testsuite test
 }
 
 testimage () {
@@ -63,10 +63,10 @@ testimage () {
   echo " "
 
   docker run \
-    -v $(pwd)/php/test/:/var/www \
+    -v $(pwd)/:/var/www \
     -i \
     $1 \
-    php /var/www/vendor/bin/phpunit --testsuite test
+    php /var/www/php/test/vendor/bin/phpunit --testsuite test
 }
 
 testxdebugimage () {
@@ -78,11 +78,11 @@ testxdebugimage () {
   docker run \
     -v $(pwd)/php/test/config/php.ini:/usr/local/etc/php/conf.d/zz-override.ini \
     -v ~/.composer:/home/www/.composer \
-    -v $(pwd)/php/test/:/var/www \
+    -v $(pwd)/:/var/www \
     -e XDEBUG_MODE=coverage \
     -i \
     $1 \
-    php -d "zend_extension=xdebug.so" /var/www/vendor/bin/phpunit --coverage-html=coverage --testsuite test
+    php -d "zend_extension=xdebug.so" /var/www/php/test/vendor/bin/phpunit --coverage-html=coverage --testsuite test
 }
 
 squashimage () {

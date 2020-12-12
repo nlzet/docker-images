@@ -2,15 +2,7 @@ ARG FROM_IMAGE
 ARG PHP_EXTENSIONS
 ARG LOCALEGEN="en_US.UTF-8 UTF-8\nnl_NL.UTF-8 UTF-8"
 
-# FROM rust:1-stretch as rust-builder
-# RUN \
-#   mkdir -p /tmp/pngquant && \
-#   cd /tmp/pngquant && \
-#   git clone  --recursive https://github.com/kornelski/pngquant.git . && \
-#   cargo build --release && \
-#   mv /tmp/pngquant/target/release/ /opt/pngquant/
-
-FROM debian:buster-slim AS debian-builder
+FROM debian:buster-slim AS builder
 ENV MHSENDMAIL_VERSION=0.2.0
 
 # build extra image optim libraries
@@ -39,26 +31,25 @@ ARG LOCALEGEN
 
 ENV PKG_CLEANLIST="librabbitmq-dev libssh-dev libbz2-dev cmake libmpdec-dev libenchant-dev libffi-dev libfreetype6-dev libjpeg62-turbo-dev libpng-dev libxpm-dev libwebp-dev libgraphicsmagick1-dev libgmp-dev zlib1g-dev zlib1g-dev libgnutls28-dev libcurl4-gnutls-dev libevent-dev libicu-dev libmagickwand-dev libkrb5-dev libc-client-dev firebird-dev libib-util libicu-dev libldap2-dev libmaxminddb-dev libmcrypt-dev libmemcached-dev zlib1g-dev libsasl2-dev libicu-dev libsasl2-dev libsnappy-dev libmosquitto-dev freetds-dev libpcre3-dev unixodbc-dev libpq-dev libzstd-dev libxml2-dev libssh2-1-dev uuid-dev libxml2-dev libxslt-dev cmake gnutls-dev libzip-dev libbz2-dev zlib1g-dev libmbedtls-dev"
 
-# COPY --from=rust-builder /opt/pngquant /opt/pngquant
-# COPY --from=debian-builder /usr/local/bin/pngquant /usr/local/bin/pngquant
-COPY --from=debian-builder /usr/local/bin/jpegtran /usr/local/bin/jpegtran
-COPY --from=debian-builder /etc/mozjpeg/lib64 /etc/mozjpeg/lib64
-COPY --from=debian-builder /usr/local/bin/mhsendmail /usr/local/bin/mhsendmail
+COPY --from=builder /usr/local/bin/jpegtran /usr/local/bin/jpegtran
+COPY --from=builder /etc/mozjpeg/lib64 /etc/mozjpeg/lib64
+COPY --from=builder /usr/local/bin/mhsendmail /usr/local/bin/mhsendmail
 COPY --from=composer /usr/bin/composer /usr/local/bin/composer
 
 ADD https://raw.githubusercontent.com/mlocati/docker-php-extension-installer/master/install-php-extensions /usr/local/bin/
 RUN \
+  savedAptMark="$(apt-mark showmanual)" && \
+  echo ">> saved apt mark" && \
+  echo ">> $savedAptMark" && \
   php -v && \
   chmod +x /usr/local/bin/install-php-extensions && sync && \
-  echo install-php-extensions ${PHP_EXTENSIONS} && \
-  install-php-extensions ${PHP_EXTENSIONS} && \
+#  install-php-extensions ${PHP_EXTENSIONS} && \
   rm -f /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini && \
   mkdir -p /home/www/.composer && \
   chown -R 1000:1000 -R /home/www/ && \
-  pkgPersistent='ca-certificates curl fontconfig fontconfig gifsicle imagemagick jpegoptim libfontconfig1 libfontenc1 libjpeg62-turbo libjpeg62-turbo libxext6 libxext6 libxrender1 make make openssl optipng pngcrush pngquant wget xfonts-75dpi xfonts-base xfonts-encodings xfonts-utils' && \
+  pkgPersistent='ca-certificates curl fontconfig gifsicle imagemagick jpegoptim libfreetype6 libjpeg62-turbo libmagic1 libpng16-16 libssl1.1 libxrender1 libzstd1 make openssl optipng pngcrush pngquant wget xfonts-75dpi xfonts-base xfonts-encodings' && \
   set -x && \
-  apt-get update && apt-get install -y $pkgPersistent --no-install-recommends
-RUN \
+  apt-get update && apt-get install -y $pkgPersistent --no-install-recommends && \
   wget -qq https://github.com/wkhtmltopdf/wkhtmltopdf/releases/download/0.12.5/wkhtmltox_0.12.5-1.buster_amd64.deb && \
   (dpkg -i wkhtmltox_0.12.5-1.buster_amd64.deb 2>&1 || apt install -yf) && \
   rm -f wkhtmltox_0.12.5-1.buster_amd64.deb && \
@@ -66,12 +57,13 @@ RUN \
   ln -sf /usr/bin/jpegoptim /usr/local/bin/jpegoptim && \
   ln -sf /usr/bin/optipng /usr/local/bin/optipng && \
   ln -sf /usr/bin/gifsicle /usr/local/bin/gifsicle && \ 
-  ln -sf /usr/bin/pngquant /usr/local/bin/pngquant
-RUN \
-  wkhtmltopdf --version && \
-  wkhtmltoimage --version && \ 
-  apt-get purge -y --auto-remove ${PKG_CLEANLIST} ${PHPIZE_DEPS} && \
+  ln -sf /usr/bin/pngquant /usr/local/bin/pngquant && \
+  apt-mark auto '.*' > /dev/null && \
+  apt-mark manual $savedAptMark $pkgPersistent && \
+  apt-get purge -y --auto-remove ${PKG_CLEANLIST} && \
+  apt-get install -y $pkgPersistent --no-install-recommends && \
   rm -rf /tmp/* /var/tmp/* /var/lib/{apt,dpkg,cache,log}/
+
 VOLUME /home/www/.composer
 
 FROM extensions as stage0
@@ -104,7 +96,6 @@ FROM stage0 as stage1
 USER root
 ENV DEBIAN_FRONTEND noninteractive
 
-# build extra image optim libraries
 RUN \
     pkgPersistent='libfontconfig1 imagemagick libjpeg62-turbo gifsicle jpegoptim make optipng pngcrush fontconfig libfontenc1 libxext6 xfonts-75dpi xfonts-base xfonts-encodings xfonts-utils' && \
     set -x && \
