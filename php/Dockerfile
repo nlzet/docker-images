@@ -63,7 +63,8 @@ RUN \
   apt-mark manual $savedAptMark $pkgPersistent && \
   apt-get purge -y --auto-remove ${PKG_CLEANLIST} && \
   apt-get install -y $pkgPersistent --no-install-recommends && \
-  rm -rf /tmp/* /var/tmp/* /var/lib/{apt,dpkg,cache,log}/
+  rm -rf /tmp/* /var/tmp/* /var/lib/{apt,dpkg,cache,log}/ && \
+  which wkhtmltopdf
 
 VOLUME /home/www/.composer
 
