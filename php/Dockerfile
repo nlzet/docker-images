@@ -48,7 +48,7 @@ RUN \
   rm -f /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini && \
   mkdir -p /home/www/.composer && \
   chown -R 1000:1000 -R /home/www/ && \
-  pkgPersistent='ca-certificates curl fontconfig gifsicle imagemagick jpegoptim libfreetype6 libjpeg62-turbo libmagic1 libpng16-16 libssl1.1 libxrender1 libzstd1 make openssl optipng pngcrush pngquant wget xfonts-75dpi xfonts-base xfonts-encodings wkhtmltox' && \
+  pkgPersistent='curl gifsicle imagemagick jpegoptim libfreetype6 libjpeg62-turbo libmagic1 libpng16-16 libssl1.1 libxrender1 libzstd1 make openssl optipng pngcrush pngquant wget wkhtmltox xfonts-75dpi xfonts-base xfonts-encodings' && \
   set -x && \
   apt-get update && \
   apt-get install -y wget && \
@@ -70,7 +70,7 @@ RUN \
 
 VOLUME /home/www/.composer
 
-FROM extensions as stage0
+FROM extensions as stage1
 ARG LOCALEGEN
 
 RUN \
@@ -83,10 +83,12 @@ RUN \
   echo "LANG=\"en_US.UTF-8\"" > /etc/default/locale && \
   echo $LOCALEGEN >> /etc/locale.gen && \
   apt-get update && \
-  apt-get install -y locales wget && \
+  apt-get install -y locales && \
   locale-gen && \
   apt-get purge -y --auto-remove locales && \
-  rm -rf /tmp/* /var/tmp/* /var/lib/{apt,dpkg,cache,log}/
+  rm -rf /tmp/* /var/tmp/* /var/lib/{apt,dpkg,cache,log}/ && \
+  # cleanup stage 1
+  chown -R 1000:1000 /home/www/
 
 ENV TERM xterm
 VOLUME /var/www
@@ -95,21 +97,6 @@ WORKDIR /var/www
 USER www
 ENV TERM xterm
 
-FROM stage0 as stage1
-
-USER root
-ENV DEBIAN_FRONTEND noninteractive
-
-RUN \
-    pkgPersistent='libfontconfig1 imagemagick libjpeg62-turbo gifsicle jpegoptim make optipng pngcrush fontconfig libfontenc1 libxext6 xfonts-75dpi xfonts-base xfonts-encodings xfonts-utils' && \
-    set -x && \
-    apt-get update && apt-get install -y $pkgPersistent --no-install-recommends && \
-    echo "convert: $(convert --version)" && \
-    rm -rf /tmp/* /var/tmp/* /var/lib/{apt,dpkg,cache,log}/ && \
-    # cleanup stage 1
-    chown -R 1000:1000 /home/www/
-
-USER www
 FROM stage1 as stage2
 USER root
 
