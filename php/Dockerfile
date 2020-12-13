@@ -44,7 +44,7 @@ RUN \
   echo ">> $savedAptMark" && \
   php -v && \
   chmod +x /usr/local/bin/install-php-extensions && sync && \
-#  install-php-extensions ${PHP_EXTENSIONS} && \
+  install-php-extensions ${PHP_EXTENSIONS} && \
   rm -f /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini && \
   mkdir -p /home/www/.composer && \
   chown -R 1000:1000 -R /home/www/ && \
