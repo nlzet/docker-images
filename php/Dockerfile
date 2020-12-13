@@ -48,11 +48,13 @@ RUN \
   rm -f /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini && \
   mkdir -p /home/www/.composer && \
   chown -R 1000:1000 -R /home/www/ && \
-  pkgPersistent='ca-certificates curl fontconfig gifsicle imagemagick jpegoptim libfreetype6 libjpeg62-turbo libmagic1 libpng16-16 libssl1.1 libxrender1 libzstd1 make openssl optipng pngcrush pngquant wget xfonts-75dpi xfonts-base xfonts-encodings' && \
+  pkgPersistent='ca-certificates curl fontconfig gifsicle imagemagick jpegoptim libfreetype6 libjpeg62-turbo libmagic1 libpng16-16 libssl1.1 libxrender1 libzstd1 make openssl optipng pngcrush pngquant wget xfonts-75dpi xfonts-base xfonts-encodings wkhtmltox' && \
   set -x && \
-  apt-get update && apt-get install -y $pkgPersistent --no-install-recommends && \
+  apt-get update && \
+  apt-get install -y wget && \
   wget -qq https://github.com/wkhtmltopdf/wkhtmltopdf/releases/download/0.12.5/wkhtmltox_0.12.5-1.buster_amd64.deb && \
   (dpkg -i wkhtmltox_0.12.5-1.buster_amd64.deb 2>&1 || apt install -yf) && \
+  apt-get install -y $pkgPersistent --no-install-recommends && \
   rm -f wkhtmltox_0.12.5-1.buster_amd64.deb && \
   rm -rf /tmp/* /var/tmp/* /var/lib/{apt,dpkg,cache,log}/ && \
   ln -sf /usr/bin/jpegoptim /usr/local/bin/jpegoptim && \
