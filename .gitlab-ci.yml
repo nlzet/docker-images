@@ -2,7 +2,6 @@ cache: &global_cache
   key: ${CI_PROJECT_ID}-php
   paths:
     - php/test/vendor/
-    - php/test/vendor/
     - /tmp/composercache/
 stages:
   - build
@@ -13,8 +12,6 @@ php7.3:
   image: docker
   script:
     - apk update && apk add tar sudo
-    - wget https://github.com/jwilder/docker-squash/releases/download/v0.2.0/docker-squash-linux-amd64-v0.2.0.tar.gz
-    - tar -C /usr/local/bin -xzvf docker-squash-linux-amd64-v0.2.0.tar.gz && chmod +x /usr/local/bin/docker-squash
     - export PHP_VERSION=7.3
     - export DOCKER_PREFIX=nlzet/php
     - docker login --username=$DOCKER_HUB_USERNAME --password=$DOCKER_HUB_PASSWORD
@@ -41,8 +38,6 @@ php7.4:
   image: docker
   script:
     - apk update && apk add tar sudo
-    - wget https://github.com/jwilder/docker-squash/releases/download/v0.2.0/docker-squash-linux-amd64-v0.2.0.tar.gz
-    - tar -C /usr/local/bin -xzvf docker-squash-linux-amd64-v0.2.0.tar.gz && chmod +x /usr/local/bin/docker-squash
     - export PHP_VERSION=7.4
     - export DOCKER_PREFIX=nlzet/php
     - docker login --username=$DOCKER_HUB_USERNAME --password=$DOCKER_HUB_PASSWORD
@@ -69,8 +64,6 @@ php8.0:
   image: docker
   script:
     - apk update && apk add tar sudo
-    - wget https://github.com/jwilder/docker-squash/releases/download/v0.2.0/docker-squash-linux-amd64-v0.2.0.tar.gz
-    - tar -C /usr/local/bin -xzvf docker-squash-linux-amd64-v0.2.0.tar.gz && chmod +x /usr/local/bin/docker-squash
     - export PHP_VERSION=8.0
     - export DOCKER_PREFIX=nlzet/php
     - docker login --username=$DOCKER_HUB_USERNAME --password=$DOCKER_HUB_PASSWORD
