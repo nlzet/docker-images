@@ -1,9 +1,10 @@
-ARG FROM_IMAGE
+ARG PHP_VERSION
 ARG PHP_EXTENSIONS
+ARG FROM_IMAGE=${FROM_IMAGE:-php:${PHP_VERSION}-fpm}
 ARG LOCALEGEN="en_US.UTF-8 UTF-8\nnl_NL.UTF-8 UTF-8"
-
+ARG UID=1000
+ARG GID=1000
 FROM debian:buster-slim AS builder
-ENV MHSENDMAIL_VERSION=0.2.0
 
 # build extra image optim libraries
 RUN \
@@ -14,9 +15,8 @@ RUN \
 
 # Mailhog sendmail helper
 RUN \
-  wget -qq -O /usr/local/bin/mhsendmail https://github.com/mailhog/mhsendmail/releases/download/v${MHSENDMAIL_VERSION}/mhsendmail_linux_amd64 && \
-  chmod +x /usr/local/bin/mhsendmail && \
-  which mhsendmail
+  wget -qq -O /usr/local/bin/mhsendmail https://github.com/mailhog/mhsendmail/releases/download/v0.2.0/mhsendmail_linux_amd64 && \
+  chmod +x /usr/local/bin/mhsendmail
 
 RUN \
   apt update && apt install -y  && \
@@ -26,8 +26,11 @@ RUN \
 
 FROM composer:latest AS composer
 FROM $FROM_IMAGE as extensions
+ARG PHP_VERSION
 ARG PHP_EXTENSIONS
 ARG LOCALEGEN
+ARG UID
+ARG GID
 
 ENV PKG_CLEANLIST="librabbitmq-dev"
 #ENV PKG_CLEANLIST="librabbitmq-dev libssh-dev libbz2-dev cmake libmpdec-dev libenchant-dev libffi-dev libfreetype6-dev libjpeg62-turbo-dev libpng-dev libxpm-dev libwebp-dev libgraphicsmagick1-dev libgmp-dev zlib1g-dev zlib1g-dev libgnutls28-dev libcurl4-gnutls-dev libevent-dev libicu-dev libmagickwand-dev libkrb5-dev libc-client-dev firebird-dev libib-util libicu-dev libldap2-dev libmaxminddb-dev libmcrypt-dev libmemcached-dev zlib1g-dev libsasl2-dev libicu-dev libsasl2-dev libsnappy-dev libmosquitto-dev freetds-dev libpcre3-dev unixodbc-dev libpq-dev libzstd-dev libxml2-dev libssh2-1-dev uuid-dev libxml2-dev libxslt-dev cmake gnutls-dev libzip-dev libbz2-dev zlib1g-dev libmbedtls-dev"
@@ -44,10 +47,8 @@ RUN \
   install-php-extensions ${PHP_EXTENSIONS} && \
   rm -f /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini && \
   savedAptMark="$(apt-mark showmanual)" && \
-  echo ">> saved apt mark" && \
-  echo ">> $savedAptMark" && \
   mkdir -p /home/www/.composer && \
-  chown -R 1000:1000 -R /home/www/ && \
+  chown -R $UID:$GID -R /home/www/ && \
   pkgPersistent='curl gifsicle imagemagick jpegoptim libfreetype6 libjpeg62-turbo libmagic1 libpng16-16 libssl1.1 libxrender1 libzstd1 make openssl optipng pngcrush pngquant wget wkhtmltox xfonts-75dpi xfonts-base xfonts-encodings' && \
   set -x && \
   apt-get update && \
@@ -65,19 +66,22 @@ RUN \
   apt-mark manual $savedAptMark $pkgPersistent && \
   apt-get purge -y --auto-remove ${PKG_CLEANLIST} && \
   apt-get install -y $pkgPersistent --no-install-recommends && \
-  rm -rf /tmp/* /var/tmp/* /var/lib/{apt,dpkg,cache,log}/ && \
-  which wkhtmltopdf
+  rm -rf /tmp/* /var/tmp/* /var/lib/{apt,dpkg,cache,log}/
 
 VOLUME /home/www/.composer
 
 FROM extensions as stage1
+ARG PHP_VERSION
+ARG PHP_EXTENSIONS
 ARG LOCALEGEN
+ARG UID
+ARG GID
 
 RUN \
   echo "date.timezone=UTC" > /usr/local/etc/php/conf.d/00-default.ini && \
   echo "memory_limit=-1" > /usr/local/etc/php/php-cli.ini && \
-  groupadd -g 1000 www &&  \
-  useradd -u 1000 -g 1000 -ms /bin/bash www && \
+  groupadd -g $UID www &&  \
+  useradd -u $UID -g $GID -ms /bin/bash www && \
   echo "alias ll='ls -la'" >> /home/www/.bashrc && \
   mkdir -p /var/www && \
   echo "LANG=\"en_US.UTF-8\"" > /etc/default/locale && \
@@ -87,8 +91,7 @@ RUN \
   locale-gen && \
   apt-get purge -y --auto-remove locales && \
   rm -rf /tmp/* /var/tmp/* /var/lib/{apt,dpkg,cache,log}/ && \
-  # cleanup stage 1
-  chown -R 1000:1000 /home/www/
+  chown -R $UID:$GID /home/www/
 
 ENV TERM xterm
 VOLUME /var/www
@@ -98,9 +101,13 @@ USER www
 ENV TERM xterm
 
 FROM stage1 as stage2
-USER root
+ARG PHP_VERSION
+ARG PHP_EXTENSIONS
+ARG LOCALEGEN
+ARG UID
+ARG GID
 
-# node/yarn/apt
+USER root
 RUN \
   curl -sL https://deb.nodesource.com/setup_12.x | bash - && \
   curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | apt-key add - && \
@@ -108,9 +115,6 @@ RUN \
   apt-get update && \
   # todo: sendmail msmtp
   apt-get install -y --no-install-recommends nodejs yarn && \
-  echo "node: $(node --version)" && \
-  echo "npm: $(npm --version)" && \
-  echo "yarn: $(yarn --version)" && \
   # Allow extension enable for the user "www"
   chown www:www -R /usr/local/etc/php/conf.d/ && \
   rm -rf /tmp/* /var/tmp/* /var/lib/{apt,dpkg,cache,log}/ && \
@@ -120,23 +124,25 @@ USER www
 CMD ["/usr/local/sbin/php-fpm"]
 
 FROM stage2 as stage3
+ARG PHP_VERSION
+ARG PHP_EXTENSIONS
+ARG LOCALEGEN
+ARG UID
+ARG GID
 
 USER root
-
 RUN \
     pkgLib='chromium libgtk2.0-0 libgtk-3-0 libgbm-dev libnotify-dev libgconf-2-4 libnss3 libxss1 libasound2 libxtst6 xauth xvfb' && \
     pkgDel='' && \
     set -x && \
     apt-get update && apt-get install -y $pkgLib --no-install-recommends && \
     apt-get purge -y --auto-remove $pkgDel && \
-    rm -rf /tmp/* /var/tmp/* /var/lib/{apt,dpkg,cache,log}/
-
-RUN \
-  wget https://get.symfony.com/cli/installer -O - | bash && \
-  mv ~/.symfony/bin/symfony /usr/local/bin/symfony && \
-  /usr/local/bin/symfony server:ca:install && \
-  cp -r /root/.symfony/ /home/www/ && \
-  chown 1000:1000 -R /home/www/
+    rm -rf /tmp/* /var/tmp/* /var/lib/{apt,dpkg,cache,log}/ && \
+    wget https://get.symfony.com/cli/installer -O - | bash && \
+    mv ~/.symfony/bin/symfony /usr/local/bin/symfony && \
+    /usr/local/bin/symfony server:ca:install && \
+    cp -r /root/.symfony/ /home/www/ && \
+    chown $UID:$GID -R /home/www/
 
 USER www
 ENV PATH="${PATH}:/home/www/.yarn/bin/"

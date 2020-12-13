@@ -12,8 +12,6 @@ prepare() {
   FROM_IMAGE=${FROM_IMAGE:-php:${PHP_VERSION}-fpm}
 
   case "$PHP_VERSION" in
-    # todo: currently unsupported php8 extensions (https://github.com/mlocati/docker-php-extension-installer#supported-php-extensions)
-    # amqp imagick xmlrpc
     "8."*) PHP_EXTENSIONS=${PHP_EXTENSIONS:-gd bcmath bz2 exif gd gettext gmp igbinary intl mcrypt mongodb mysqli pdo_mysql pdo_pgsql redis sockets soap xdebug xsl zip} ;;
     *) PHP_EXTENSIONS=${PHP_EXTENSIONS:-amqp bcmath bz2 exif gd gettext gmp igbinary imagick intl mcrypt mongodb mysqli pdo_mysql pdo_pgsql redis sockets soap xdebug xmlrpc xsl zip}
   esac

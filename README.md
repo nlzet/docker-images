@@ -1,11 +1,12 @@
 # Docker PHP images
 This repository serves as an easy way to configure and build docker PHP images (powered by [docker-php-extension-installer]([https://github.com/mlocati/docker-php-extension-installer](https://github.com/mlocati/docker-php-extension-installer))) with some extra libraries and tools:
-* locales: install extra locales with locale-gen to support internal PHP date localization
-* install system tools for image optimization, (usage example [[https://github.com/psliwa/image-optimizer](https://github.com/psliwa/image-optimizer)]): `optipng  pngcrush  pngquant, jpegoptim, gifsicle, jpegtran`
-* `mhsendmail` for local email debugging
-* `wkhtmltopdf` for pdf generation
-* `nodejs / yarn` (only in stage2, see below)
-* `chromium, symfony server, global node packages, ...` (only in stage3, see below)
+* `locales`: install extra locales with locale-gen to support internal PHP date localization
+* `optipng  pngcrush  pngquant, jpegoptim, gifsicle, jpegtran` install system tools for image optimization, (usage example [[https://github.com/psliwa/image-optimizer](https://github.com/psliwa/image-optimizer)])
+* `mhsendmail` for local email debugging with mailhog (installed but disabled by default, , can be enabled with ini configuration (cli argument or mounted .ini file)
+* `wkhtmltopdf wkhtmltoimage` for html to pdf/image conversion
+* `nodejs / yarn` (added at stage2, see below)
+* `chromium, symfony server, global node packages, ...` (at stage3, see below)
+* `xdebug` is installed but disabled by default, can be enabled with ini configuration (cli argument or mounted .ini file)
 
 # Available tags
 
@@ -23,15 +24,25 @@ This repository serves as an easy way to configure and build docker PHP images (
 | [nlzet/php:8.0-fpm](https://hub.docker.com/r/nlzet/php/tags) | stage2 |
 | [nlzet/php:8.0-ci](https://hub.docker.com/r/nlzet/php/tags) | stage3 |
 
-All tags are built and pushed weekly (on Thursday), these default options are applied to all built tags:
+All tags are built weekly (on Thursday) based on the official php `major.minor` php tags (e.g. `php:7.4-fpm`). The following defaults are applied to these builds:
+
+
+*todo*: currently unsupported php8 extensions (https://github.com/mlocati/docker-php-extension-installer#supported-php-extensions)
+
+* amqp
+* imagick
+* xmlrpc
 
 | Option | Value |
 |--|--|
-| PHP_EXTENSIONS | `amqp bcmath bz2 exif gd gettext gmp igbinary imagick intl mcrypt mongodb mysqli pdo_mysql pdo_pgsql redis sockets soap xdebug xmlrpc xsl zip` (PHP 8 limits to the currently supported extensions) |
+| PHP_EXTENSIONS | `amqp bcmath bz2 exif gd gettext gmp igbinary imagick intl mcrypt mongodb mysqli pdo_mysql pdo_pgsql redis sockets soap xdebug xmlrpc xsl zip` |
 | FROM_IMAGE | `php:${PHP_VERSION}-fpm` |
   
 # Building your own image  
-  
+
+You can build your own image with your own set of php extensions and configuration options.
+Available options and information are described below:
+
 ## Configuration options:  
   
 ### Build options
@@ -45,28 +56,27 @@ All tags are built and pushed weekly (on Thursday), these default options are ap
 
 | Variable | Explanation | Default | 
 |--|--|--|
-|FROM_IMAGE|Choose a tag from the official PHP base images. You should choose a `-fpm` to support it in all multistage builds | `php:${PHP_VERSION}-fpm`|
 |LOCALEGEN|String containing the locales to install, seperated by `\n`|`en_US.UTF-8 UTF-8\nnl_NL.UTF-8 UTF-8`|
+|UID| www user id | `1000` |
+|GID| www group id | `1000` |
+|FROM_IMAGE|Choose a tag from the official PHP base images. You should choose a `-fpm` to support it in all multistage builds | `php:${PHP_VERSION}-fpm`|
 
 ### Multistage build targets
 
-| Docker stage | Description |
-|--|--|
-| builder | build-/download external dependencies from source like image optim libraries or mhsendmail |
-| composer | composer multistage to export composer binary |
-| extensions | base image, builds requested PHP extensions and configures image optim packages |
-| stage1 | configure cli container, install locales |
-| stage2 | configure fpm image, add nodejs and yarn |
-| stage3 | configure ci image, add extras like global node packages and install/configure ymfony webserver |
+| Docker stage | Description | Entrypoint |
+|--|--|--| 
+| builder | build-/download external dependencies from source like image optim libraries or mhsendmail | default |
+| composer | composer multistage to export composer binary | default |
+| extensions | base image, builds requested PHP extensions and configures image optim packages | default |
+| stage1 | cli image with entrypoint php bin and install locales | php bin |
+| stage2 | fpm image with entrypoint fpm and add nodejs and yarn | fpm bin |
+| stage3 | ci image for CI e2e testing | php bin |
   
 ### Example build:
 
-    export PHP_VERSION=7.4
-    export PHP_EXTENSIONS="gd xdebug"  
-    
     docker build \
-	    --build-arg PHP_EXTENSIONS="${PHP_EXTENSIONS}" \
-	    --build-arg FROM_IMAGE=${FROM_IMAGE} \
+	    --build-arg PHP_EXTENSIONS="gd xdebug" \
+	    --build-arg PHP_VERSION=7.4 \
 	    --target stage1 \
 	    php/ \
 	    --pull
