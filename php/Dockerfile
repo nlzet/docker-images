@@ -39,13 +39,13 @@ COPY --from=composer /usr/bin/composer /usr/local/bin/composer
 
 ADD https://raw.githubusercontent.com/mlocati/docker-php-extension-installer/master/install-php-extensions /usr/local/bin/
 RUN \
-  savedAptMark="$(apt-mark showmanual)" && \
-  echo ">> saved apt mark" && \
-  echo ">> $savedAptMark" && \
   php -v && \
   chmod +x /usr/local/bin/install-php-extensions && sync && \
   install-php-extensions ${PHP_EXTENSIONS} && \
   rm -f /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini && \
+  savedAptMark="$(apt-mark showmanual)" && \
+  echo ">> saved apt mark" && \
+  echo ">> $savedAptMark" && \
   mkdir -p /home/www/.composer && \
   chown -R 1000:1000 -R /home/www/ && \
   pkgPersistent='curl gifsicle imagemagick jpegoptim libfreetype6 libjpeg62-turbo libmagic1 libpng16-16 libssl1.1 libxrender1 libzstd1 make openssl optipng pngcrush pngquant wget wkhtmltox xfonts-75dpi xfonts-base xfonts-encodings' && \
