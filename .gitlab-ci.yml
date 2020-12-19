@@ -70,6 +70,8 @@ php8.0:
     - ./run.sh build cli stage1 "--no-cache"
     - ./run.sh build fpm stage2
     - ./run.sh build ci stage3
+    # todo: remove when composer dependencies support PHP 8
+    - docker run -w /var/www/php/test/ -v /tmp/composercache/:/home/www/.composer/cache/ -v $(pwd)/:/var/www -i ${DOCKER_PREFIX}:${PHP_VERSION}-cli composer config platform.php "7.3"
     - docker run -w /var/www/php/test/ -v /tmp/composercache/:/home/www/.composer/cache/ -v $(pwd)/:/var/www -i ${DOCKER_PREFIX}:${PHP_VERSION}-cli composer install
     - ./run.sh testxdebug
     - ./run.sh push cli
