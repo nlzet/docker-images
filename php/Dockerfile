@@ -4,15 +4,6 @@ ARG FROM_IMAGE=${FROM_IMAGE:-php:${PHP_VERSION}-fpm}
 ARG LOCALEGEN="en_US.UTF-8 UTF-8\nnl_NL.UTF-8 UTF-8"
 ARG UID=1000
 ARG GID=1000
-FROM $FROM_IMAGE AS ext-amqp
-
-ENV EXT_AMQP_VERSION=master
-RUN \
-    docker-php-source extract \
-    && apt update && apt -y install --no-install-recommends git librabbitmq-dev \
-    && git clone --branch $EXT_AMQP_VERSION --depth 1 https://github.com/php-amqp/php-amqp.git /usr/src/php/ext/amqp \
-    && cd /usr/src/php/ext/amqp && git submodule update --init \
-    && docker-php-ext-install amqp
 
 FROM debian:buster-slim AS builder
 
@@ -68,7 +59,6 @@ RUN \
   rm -rf /tmp/* /var/tmp/* /var/lib/{apt,dpkg,cache,log}/ && \
   chown -R $UID:$GID -R /home/www/
 
-COPY --from=ext-amqp /usr/local/lib/php/extensions/no-debug-non-zts-20200930/amqp.so /usr/local/lib/php/extensions/no-debug-non-zts-20200930/amqp8.so
 ADD ./helper/php8-amqp.sh /tmp/php8-amqp.sh
 RUN chmod +x /tmp/php8-amqp.sh && /tmp/php8-amqp.sh && rm -f /tmp/php8-amqp.sh
 
