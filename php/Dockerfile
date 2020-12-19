@@ -65,7 +65,8 @@ RUN \
   apt-mark manual $savedAptMark $pkgPersistent && \
   apt-get purge -y --auto-remove && \
   apt-get install -y $pkgPersistent --no-install-recommends && \
-  rm -rf /tmp/* /var/tmp/* /var/lib/{apt,dpkg,cache,log}/
+  rm -rf /tmp/* /var/tmp/* /var/lib/{apt,dpkg,cache,log}/ && \
+  chown -R $UID:$GID -R /home/www/
 
 COPY --from=ext-amqp /usr/local/lib/php/extensions/no-debug-non-zts-20200930/amqp.so /usr/local/lib/php/extensions/no-debug-non-zts-20200930/amqp8.so
 ADD ./helper/php8-amqp.sh /tmp/php8-amqp.sh
