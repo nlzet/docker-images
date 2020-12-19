@@ -4,6 +4,16 @@ ARG FROM_IMAGE=${FROM_IMAGE:-php:${PHP_VERSION}-fpm}
 ARG LOCALEGEN="en_US.UTF-8 UTF-8\nnl_NL.UTF-8 UTF-8"
 ARG UID=1000
 ARG GID=1000
+FROM $FROM_IMAGE AS ext-amqp
+
+ENV EXT_AMQP_VERSION=master
+RUN \
+    docker-php-source extract \
+    && apt update && apt -y install --no-install-recommends git librabbitmq-dev \
+    && git clone --branch $EXT_AMQP_VERSION --depth 1 https://github.com/php-amqp/php-amqp.git /usr/src/php/ext/amqp \
+    && cd /usr/src/php/ext/amqp && git submodule update --init \
+    && docker-php-ext-install amqp
+
 FROM debian:buster-slim AS builder
 
 # build extra image optim libraries
@@ -11,20 +21,13 @@ RUN \
   pkgVolatile='wget build-essential cmake gcc libc6-dev git-core make libfreetype6-dev libicu-dev libjpeg-dev libjpeg62-turbo-dev libpng-dev zlib1g-dev libxrender1 libssl-dev autoconf automake libtool pkgconf nasm xfonts-75dpi xfonts-base' && \
   pkgPersistent='fontconfig libxext6 libfontconfig1 ca-certificates openssl libjpeg62-turbo make' && \
   set -x && \
-  apt-get update && apt-get install -y $pkgVolatile $pkgPersistent --no-install-recommends
-
-# Mailhog sendmail helper
-RUN \
+  apt-get update && apt-get install -y $pkgVolatile $pkgPersistent --no-install-recommends && \
   wget -qq -O /usr/local/bin/mhsendmail https://github.com/mailhog/mhsendmail/releases/download/v0.2.0/mhsendmail_linux_amd64 && \
-  chmod +x /usr/local/bin/mhsendmail
-
-RUN \
-  apt update && apt install -y  && \
+  chmod +x /usr/local/bin/mhsendmail && \
   mkdir -p /tmp/mozjpeg && cd /tmp/mozjpeg && wget -qq https://github.com/mozilla/mozjpeg/archive/v3.3.1.tar.gz && tar -xzf v3.3.1.tar.gz && SRC_DIR=$(ls -t1 -d mozjpeg-* | head -n1) && cd $SRC_DIR && autoreconf -fiv && cd .. && sh $SRC_DIR/configure && make install prefix=/usr/local libdir=/etc/mozjpeg/lib64 && \
   apt-get purge -y --auto-remove $pkgVolatile && \
   rm -rf /tmp/* /var/tmp/* /var/lib/{apt,dpkg,cache,log}/
 
-FROM composer:latest AS composer
 FROM $FROM_IMAGE as extensions
 ARG PHP_VERSION
 ARG PHP_EXTENSIONS
@@ -35,7 +38,6 @@ ARG GID
 COPY --from=builder /usr/local/bin/jpegtran /usr/local/bin/jpegtran
 COPY --from=builder /etc/mozjpeg/lib64 /etc/mozjpeg/lib64
 COPY --from=builder /usr/local/bin/mhsendmail /usr/local/bin/mhsendmail
-COPY --from=composer /usr/bin/composer /usr/local/bin/composer
 
 ADD https://raw.githubusercontent.com/mlocati/docker-php-extension-installer/master/install-php-extensions /usr/local/bin/
 RUN \
@@ -46,7 +48,7 @@ RUN \
   savedAptMark="$(apt-mark showmanual)" && \
   mkdir -p /home/www/.composer && \
   chown -R $UID:$GID -R /home/www/ && \
-  pkgPersistent='curl gifsicle imagemagick jpegoptim libfreetype6 libjpeg62-turbo libmagic1 libpng16-16 libssl1.1 libxrender1 libzstd1 make openssl optipng pngcrush pngquant wget wkhtmltox xfonts-75dpi xfonts-base xfonts-encodings' && \
+  pkgPersistent='curl gifsicle imagemagick jpegoptim libfreetype6 libjpeg62-turbo libmagic1 libpng16-16 librabbitmq4 libssl1.1 libxrender1 libzstd1 make openssl optipng pngcrush pngquant wget wkhtmltox xfonts-75dpi xfonts-base xfonts-encodings' && \
   set -x && \
   apt-get update && \
   apt-get install -y wget && \
@@ -64,6 +66,10 @@ RUN \
   apt-get purge -y --auto-remove && \
   apt-get install -y $pkgPersistent --no-install-recommends && \
   rm -rf /tmp/* /var/tmp/* /var/lib/{apt,dpkg,cache,log}/
+
+COPY --from=ext-amqp /usr/local/lib/php/extensions/no-debug-non-zts-20200930/amqp.so /usr/local/lib/php/extensions/no-debug-non-zts-20200930/amqp8.so
+ADD ./helper/php8-amqp.sh /tmp/php8-amqp.sh
+RUN chmod +x /tmp/php8-amqp.sh && /tmp/php8-amqp.sh && rm -f /tmp/php8-amqp.sh
 
 VOLUME /home/www/.composer
 
@@ -84,9 +90,8 @@ RUN \
   echo "LANG=\"en_US.UTF-8\"" > /etc/default/locale && \
   echo $LOCALEGEN >> /etc/locale.gen && \
   apt-get update && \
-  apt-get install -y locales && \
+  apt-get install -y --no-install-recommends locales && \
   locale-gen && \
-  apt-get purge -y --auto-remove locales && \
   rm -rf /tmp/* /var/tmp/* /var/lib/{apt,dpkg,cache,log}/ && \
   chown -R $UID:$GID /home/www/
 

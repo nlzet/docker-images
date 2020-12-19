@@ -29,8 +29,6 @@ All tags are built weekly (on Thursday) based on the official php `major.minor` 
 
 *todo*: currently unsupported php8 extensions (https://github.com/mlocati/docker-php-extension-installer#supported-php-extensions)
 
-* amqp
-* imagick
 * xmlrpc
 
 | Option | Value |

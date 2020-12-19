@@ -12,8 +12,8 @@ prepare() {
   FROM_IMAGE=${FROM_IMAGE:-php:${PHP_VERSION}-fpm}
 
   case "$PHP_VERSION" in
-    "8."*) PHP_EXTENSIONS=${PHP_EXTENSIONS:-gd bcmath bz2 exif gd gettext gmp igbinary intl mcrypt mongodb mysqli pdo_mysql pdo_pgsql redis sockets soap xdebug xsl zip} ;;
-    *) PHP_EXTENSIONS=${PHP_EXTENSIONS:-amqp bcmath bz2 exif gd gettext gmp igbinary imagick intl mcrypt mongodb mysqli pdo_mysql pdo_pgsql redis sockets soap xdebug xmlrpc xsl zip}
+    "8."*) PHP_EXTENSIONS=${PHP_EXTENSIONS:-@composer gd bcmath bz2 exif gd gettext gmp igbinary imagick intl mcrypt mongodb mysqli pdo_mysql pdo_pgsql redis sockets soap xdebug xsl zip} ;;
+    *) PHP_EXTENSIONS=${PHP_EXTENSIONS:-@composer amqp bcmath bz2 exif gd gettext gmp igbinary imagick intl mcrypt mongodb mysqli pdo_mysql pdo_pgsql redis sockets soap xdebug xmlrpc xsl zip}
   esac
 
   # parse PHP version number
@@ -51,7 +51,7 @@ testcontainer () {
   echo "#########"
   echo " "
 
-  docker exec -i $1 php /var/www/php/test/vendor/bin/phpunit --testsuite test
+  docker exec -w /var/www/php/test/ -i $1 php /var/www/php/test/vendor/bin/phpunit --testsuite test
 }
 
 testimage () {
