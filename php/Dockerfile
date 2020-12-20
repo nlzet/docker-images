@@ -42,7 +42,7 @@ RUN \
   savedAptMark="$(apt-mark showmanual)" && \
   mkdir -p /home/www/.composer && \
   chown -R $UID:$GID -R /home/www/ && \
-  pkgPersistent='curl gifsicle imagemagick jpegoptim libfreetype6 libjpeg62-turbo libmagic1 libpng16-16 librabbitmq4 libssl1.1 libxrender1 libzstd1 make openssl optipng pngcrush pngquant wget wkhtmltox xfonts-75dpi xfonts-base xfonts-encodings' && \
+  pkgPersistent='curl gifsicle imagemagick jpegoptim libfreetype6 libjpeg62-turbo libmagic1 libpng16-16 librabbitmq4 libssl1.1 libxrender1 libzstd1 make openssl optipng pngcrush pngquant unzip wget wkhtmltox xfonts-75dpi xfonts-base xfonts-encodings' && \
   set -x && \
   apt-get update && \
   apt-get install -y wget && \
@@ -59,6 +59,7 @@ RUN \
   apt-get purge -y --auto-remove && \
   apt-get install -y $pkgPersistent --no-install-recommends && \
   chown -R $UID:$GID -R /home/www/ && \
+  chown -R $UID:$GID -R /var/www/ && \
   rm -rf /root/.composer/cache/ && \
   /tmp/php8-amqp.sh build && \
   unset INSTALL_AMQP8 && \
