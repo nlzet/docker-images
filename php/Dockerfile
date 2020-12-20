@@ -82,7 +82,7 @@ RUN \
   locale-gen && \
   rm -rf /tmp/* /var/tmp/* /var/lib/{apt,dpkg,cache,log}/ && \
   mkdir -p /var/www && \
-  mkdir -p /home/www/.composer && \
+  mkdir -p /home/www/.composer/cache/ && \
   chown -R $UID:$GID /home/www/ && \
   chown -R $UID:$GID /var/www/
 

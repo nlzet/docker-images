@@ -1,5 +1,5 @@
 cache: &global_cache
-  key: ${CI_PROJECT_ID}-php
+  key: ${CI_PROJECT_ID}-build-php
   paths:
     - php/test/vendor/
     - /tmp/composercache/
