@@ -102,6 +102,29 @@ final class ExtensionTest extends TestCase
         $this->assertEquals('€ 1.234.567,89', $generated);
     }
 
+    public function provideLocaleTests() 
+    {
+        return [
+            [null, 'March'],
+            ['nl_NL.UTF-8', 'maart'],
+            ['nl_BE.UTF-8', 'maart'],
+            ['fr_FR.UTF-8', 'mars'],
+            ['de_DE.UTF-8', 'März'],
+        ];
+    }
+
+    /**
+     * @dataProvider provideLocaleTests
+     */
+    public function testLocale(?string $locale, string $expectedJanuaryTranslation): void
+    {
+        if ($locale) {
+            setlocale(LC_ALL, $locale);
+        }
+
+        $this->assertEquals($expectedJanuaryTranslation, strftime('%B', strtotime('2020/03/01')));
+    }
+
     public function testRedis(): void
     {
         // basic testing, just class usage

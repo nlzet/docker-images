@@ -6,7 +6,7 @@ install_amqp8 () {
   echo "> installing php8 amqp source build"
   docker-php-source extract
   apt update && apt -y install --no-install-recommends git librabbitmq-dev \
-  git clone --branch master --depth 1 https://github.com/php-amqp/php-amqp.git /usr/src/php/ext/amqp \
+  git clone --depth 1 https://github.com/php-amqp/php-amqp.git /usr/src/php/ext/amqp \
   cd /usr/src/php/ext/amqp && git submodule update --init \
   docker-php-ext-install amqp
   rm -rf /usr/src/php/ext/amqp /tmp/* /var/tmp/* /var/lib/{apt,dpkg,cache,log}/

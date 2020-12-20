@@ -1,7 +1,7 @@
 ARG PHP_VERSION
 ARG PHP_EXTENSIONS
 ARG FROM_IMAGE=${FROM_IMAGE:-php:${PHP_VERSION}-fpm}
-ARG LOCALEGEN="en_US.UTF-8 UTF-8\nnl_NL.UTF-8 UTF-8"
+ARG LOCALEGEN="en_US.UTF-8 UTF-8\nnl_NL.UTF-8 UTF-8\nnl_BE.UTF-8 UTF-8\nfr_FR.UTF-8 UTF-8\nde_DE.UTF-8 UTF-8"
 ARG UID=1000
 ARG GID=1000
 
@@ -57,7 +57,8 @@ RUN \
   apt-get purge -y --auto-remove && \
   apt-get install -y $pkgPersistent --no-install-recommends && \
   rm -rf /tmp/* /var/tmp/* /var/lib/{apt,dpkg,cache,log}/ && \
-  chown -R $UID:$GID -R /home/www/
+  chown -R $UID:$GID -R /home/www/ && \
+  rm -rf /root/.composer/cache/
 
 ADD ./helper/php8-amqp.sh /tmp/php8-amqp.sh
 RUN chmod +x /tmp/php8-amqp.sh && /tmp/php8-amqp.sh && rm -f /tmp/php8-amqp.sh
