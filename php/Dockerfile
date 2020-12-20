@@ -30,10 +30,13 @@ COPY --from=builder /usr/local/bin/jpegtran /usr/local/bin/jpegtran
 COPY --from=builder /etc/mozjpeg/lib64 /etc/mozjpeg/lib64
 COPY --from=builder /usr/local/bin/mhsendmail /usr/local/bin/mhsendmail
 
+ADD ./helper/php8-amqp.sh /tmp/php8-amqp.sh
 ADD https://raw.githubusercontent.com/mlocati/docker-php-extension-installer/master/install-php-extensions /usr/local/bin/
 RUN \
   php -v && \
   chmod +x /usr/local/bin/install-php-extensions && sync && \
+  chmod +x /tmp/php8-amqp.sh && \
+  eval $(/tmp/php8-amqp.sh env) && \
   install-php-extensions ${PHP_EXTENSIONS} && \
   rm -f /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini && \
   savedAptMark="$(apt-mark showmanual)" && \
@@ -47,7 +50,6 @@ RUN \
   (dpkg -i wkhtmltox_0.12.5-1.buster_amd64.deb 2>&1 || apt install -yf) && \
   apt-get install -y $pkgPersistent --no-install-recommends && \
   rm -f wkhtmltox_0.12.5-1.buster_amd64.deb && \
-  rm -rf /tmp/* /var/tmp/* /var/lib/{apt,dpkg,cache,log}/ && \
   ln -sf /usr/bin/jpegoptim /usr/local/bin/jpegoptim && \
   ln -sf /usr/bin/optipng /usr/local/bin/optipng && \
   ln -sf /usr/bin/gifsicle /usr/local/bin/gifsicle && \ 
@@ -56,12 +58,11 @@ RUN \
   apt-mark manual $savedAptMark $pkgPersistent && \
   apt-get purge -y --auto-remove && \
   apt-get install -y $pkgPersistent --no-install-recommends && \
-  rm -rf /tmp/* /var/tmp/* /var/lib/{apt,dpkg,cache,log}/ && \
   chown -R $UID:$GID -R /home/www/ && \
-  rm -rf /root/.composer/cache/
-
-ADD ./helper/php8-amqp.sh /tmp/php8-amqp.sh
-RUN chmod +x /tmp/php8-amqp.sh && /tmp/php8-amqp.sh && rm -f /tmp/php8-amqp.sh
+  rm -rf /root/.composer/cache/ && \
+  /tmp/php8-amqp.sh build && \
+  unset INSTALL_AMQP8 && \
+  rm -rf /tmp/* /var/tmp/* /var/lib/{apt,dpkg,cache,log}/
 
 VOLUME /home/www/.composer
 
