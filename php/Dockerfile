@@ -56,12 +56,8 @@ RUN \
   apt-mark manual $savedAptMark $pkgPersistent && \
   apt-get purge -y --auto-remove && \
   apt-get install -y $pkgPersistent --no-install-recommends && \
-  chown -R $UID:$GID -R /home/www/ && \
-  chown -R $UID:$GID -R /var/www/ && \
   /tmp/php8-amqp.sh build && \
   unset INSTALL_AMQP8 && \
-  mkdir -p /home/www/.composer && \
-  chown $UID:$GID -R /home/www/ && \
   rm -rf /tmp/* /var/tmp/* /var/lib/{apt,dpkg,cache,log}/
 
 VOLUME /home/www/.composer
@@ -79,14 +75,16 @@ RUN \
   groupadd -g $UID www &&  \
   useradd -u $UID -g $GID -ms /bin/bash www && \
   echo "alias ll='ls -la'" >> /home/www/.bashrc && \
-  mkdir -p /var/www && \
   echo "LANG=\"en_US.UTF-8\"" > /etc/default/locale && \
   echo $LOCALEGEN >> /etc/locale.gen && \
   apt-get update && \
   apt-get install -y --no-install-recommends locales && \
   locale-gen && \
   rm -rf /tmp/* /var/tmp/* /var/lib/{apt,dpkg,cache,log}/ && \
-  chown -R $UID:$GID /home/www/
+  mkdir -p /var/www && \
+  mkdir -p /home/www/.composer && \
+  chown -R $UID:$GID /home/www/ && \
+  chown -R $UID:$GID /var/www/
 
 ENV TERM xterm
 VOLUME /var/www
@@ -111,7 +109,7 @@ RUN \
   # todo: sendmail msmtp
   apt-get install -y --no-install-recommends nodejs yarn && \
   # Allow extension enable for the user "www"
-  chown www:www -R /usr/local/etc/php/conf.d/ && \
+  chown -R $UID:$GID /usr/local/etc/php/conf.d/ && \
   rm -rf /tmp/* /var/tmp/* /var/lib/{apt,dpkg,cache,log}/ && \
   mkdir /var/run/sshd
 
@@ -137,7 +135,7 @@ RUN \
     mv ~/.symfony/bin/symfony /usr/local/bin/symfony && \
     /usr/local/bin/symfony server:ca:install && \
     cp -r /root/.symfony/ /home/www/ && \
-    chown $UID:$GID -R /home/www/
+    chown -R $UID:$GID /home/www/
 
 USER www
 ENV PATH="${PATH}:/home/www/.yarn/bin/"
