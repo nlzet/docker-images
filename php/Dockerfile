@@ -79,12 +79,14 @@ RUN \
   apt-get install -y --no-install-recommends locales && \
   locale-gen && \
   rm -rf /tmp/* /var/tmp/* /var/lib/{apt,dpkg,cache,log}/ && \
-  mkdir -p /var/www && \
   mkdir -p /home/www/.composer/cache/ && \
+  mkdir -p /home/www/.ssh/ && \
+  mkdir -p /var/www && \
   chown -vR $UID:$GID /home/www/ && \
   chown -vR $UID:$GID /var/www/
 
 VOLUME /home/www/.composer
+VOLUME /home/www/.ssh
 VOLUME /var/www
 
 ENV TERM xterm
