@@ -60,8 +60,6 @@ RUN \
   unset INSTALL_AMQP8 && \
   rm -rf /tmp/* /var/tmp/* /var/lib/{apt,dpkg,cache,log}/
 
-VOLUME /home/www/.composer
-
 FROM extensions as stage1
 ARG PHP_VERSION
 ARG PHP_EXTENSIONS
@@ -83,11 +81,13 @@ RUN \
   rm -rf /tmp/* /var/tmp/* /var/lib/{apt,dpkg,cache,log}/ && \
   mkdir -p /var/www && \
   mkdir -p /home/www/.composer/cache/ && \
-  chown -R $UID:$GID /home/www/ && \
-  chown -R $UID:$GID /var/www/
+  chown -vR $UID:$GID /home/www/ && \
+  chown -vR $UID:$GID /var/www/
+
+VOLUME /home/www/.composer
+VOLUME /var/www
 
 ENV TERM xterm
-VOLUME /var/www
 WORKDIR /var/www
 
 USER www
