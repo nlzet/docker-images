@@ -9,8 +9,8 @@ FROM debian:buster-slim AS builder
 
 # build extra image optim libraries
 RUN \
-  pkgVolatile='wget build-essential cmake gcc libc6-dev git-core make libfreetype6-dev libicu-dev libjpeg-dev libjpeg62-turbo-dev libpng-dev zlib1g-dev libxrender1 libssl-dev autoconf automake libtool pkgconf nasm xfonts-75dpi xfonts-base' && \
-  pkgPersistent='fontconfig libxext6 libfontconfig1 ca-certificates openssl libjpeg62-turbo make' && \
+  pkgVolatile='wget build-essential cmake gcc libc6-dev make libfreetype6-dev libicu-dev libjpeg-dev libjpeg62-turbo-dev libpng-dev zlib1g-dev libxrender1 libssl-dev autoconf automake libtool pkgconf nasm xfonts-75dpi xfonts-base' && \
+  pkgPersistent='fontconfig git-core libxext6 libfontconfig1 ca-certificates openssl libjpeg62-turbo make' && \
   set -x && \
   apt-get update && apt-get install -y $pkgVolatile $pkgPersistent --no-install-recommends && \
   wget -qq -O /usr/local/bin/mhsendmail https://github.com/mailhog/mhsendmail/releases/download/v0.2.0/mhsendmail_linux_amd64 && \
