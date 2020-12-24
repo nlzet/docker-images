@@ -26,7 +26,6 @@ This repository serves as an easy way to configure and build docker PHP images (
 
 All tags are built weekly (on Thursday) based on the official php `major.minor` php tags (e.g. `php:7.4-fpm`). The following defaults are applied to these builds:
 
-
 *todo*: currently unsupported php8 extensions (https://github.com/mlocati/docker-php-extension-installer#supported-php-extensions)
 
 * xmlrpc
@@ -45,19 +44,19 @@ Available options and information are described below:
   
 ### Build options
 
-| Variable | Explanation |  
-|--|--|
-|PHP_VERSION|Choose the PHP version, you can select major, minor and patch version. E.g. `7` or `7.4.10`|
-|PHP_EXTENSIONS|Choose the PHP extensions to install, select supported extensions from [https://github.com/mlocati/docker-php-extension-installer#supported-php-extensions](https://github.com/mlocati/docker-php-extension-installer#supported-php-extensions)|
-
-### Extra build options
-
-| Variable | Explanation | Default | 
+| Variable | Description | Default | 
 |--|--|--|
-|LOCALEGEN|String containing the locales to install, seperated by `\n`|`en_US.UTF-8 UTF-8\nnl_NL.UTF-8 UTF-8`|
+|PHP_VERSION|Choose the PHP version, you can select major, minor and patch version. E.g. `7`, `7.4` or `7.4.10`| |
+|PHP_EXTENSIONS|Choose the PHP extensions to install, select supported extensions from [https://github.com/mlocati/docker-php-extension-installer#supported-php-extensions](https://github.com/mlocati/docker-php-extension-installer#supported-php-extensions)| |
+|LOCALEGEN|String containing the locales to install, seperated by `\n`|`en_US.UTF-8 UTF-8\nnl_NL.UTF-8 UTF-8\nnl_BE.UTF-8 UTF-8\nfr_FR.UTF-8 UTF-8\nde_DE.UTF-8 UTF-8`|
 |UID| www user id | `1000` |
 |GID| www group id | `1000` |
-|FROM_IMAGE|Choose a tag from the official PHP base images. You should choose a `-fpm` to support it in all multistage builds | `php:${PHP_VERSION}-fpm`|
+
+### Auto-generated options
+
+| Variable | Description | Default | 
+|--|--|--|
+|FROM_IMAGE|Tag from the official PHP base images to base on (choose a `-fpm` suffix to support it in all multistage builds) | `php:${PHP_VERSION}-fpm`|
 
 ### Multistage build targets
 
@@ -78,3 +77,31 @@ Available options and information are described below:
 	    --target stage1 \
 	    php/ \
 	    --pull
+
+# Using the image
+
+## CLI
+
+### Check PHP configuration:
+
+    # get version
+    docker run -it nlzet/php:7.3-cli php -v
+    
+    # list configured modules
+    docker run -it nlzet/php:7.3-cli php -m
+    
+    # list configured ini files
+    docker run -it nlzet/php:7.3-cli php --ini
+    
+### Enable Xdebug:
+    
+    # command line argument
+    docker run -it nlzet/php:7.3-cli php -d zend_extension=xdebug.so -v
+    
+    # or with a mounted .ini file, containing "zend_extension=xdebug.so"
+    docker run -v $(pwd)/xdebug.ini:/usr/local/etc/php/conf.d/99-enable-xdebug.ini -it nlzet/php:7.3-cli php -v
+    
+## FPM:
+    
+    # start fpm container, wich will directly start php-fpm
+    docker run -it nlzet/php:7.3-fpm    
