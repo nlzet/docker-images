@@ -10,7 +10,7 @@ FROM debian:buster-slim AS builder
 # build extra image optim libraries
 RUN \
   pkgVolatile='wget build-essential cmake gcc libc6-dev make libfreetype6-dev libicu-dev libjpeg-dev libjpeg62-turbo-dev libpng-dev zlib1g-dev libxrender1 libssl-dev autoconf automake libtool pkgconf nasm xfonts-75dpi xfonts-base' && \
-  pkgPersistent='fontconfig git-core libxext6 libfontconfig1 ca-certificates openssl libjpeg62-turbo make' && \
+  pkgPersistent='fontconfig libxext6 libfontconfig1 ca-certificates openssl libjpeg62-turbo make' && \
   set -x && \
   apt-get update && apt-get install -y $pkgVolatile $pkgPersistent --no-install-recommends && \
   wget -qq -O /usr/local/bin/mhsendmail https://github.com/mailhog/mhsendmail/releases/download/v0.2.0/mhsendmail_linux_amd64 && \
@@ -40,7 +40,7 @@ RUN \
   install-php-extensions ${PHP_EXTENSIONS} && \
   rm -f /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini && \
   savedAptMark="$(apt-mark showmanual)" && \
-  pkgPersistent='curl gifsicle imagemagick jpegoptim libfreetype6 libjpeg62-turbo libmagic1 libpng16-16 librabbitmq4 libssl1.1 libxrender1 libzstd1 make nano openssl optipng pngcrush pngquant ssh-client unzip vim wget wkhtmltox xfonts-75dpi xfonts-base xfonts-encodings' && \
+  pkgPersistent='curl git git-core gifsicle imagemagick jpegoptim less libfreetype6 libjpeg62-turbo libmagic1 libpng16-16 librabbitmq4 libssl1.1 libxrender1 libzstd1 make nano openssl optipng pngcrush pngquant ssh-client unzip vim wget wkhtmltox xfonts-75dpi xfonts-base xfonts-encodings' && \
   set -x && \
   apt-get update && \
   apt-get install -y wget && \
@@ -76,8 +76,8 @@ RUN \
   echo "LANG=\"en_US.UTF-8\"" > /etc/default/locale && \
   echo $LOCALEGEN >> /etc/locale.gen && \
   apt-get update && \
+  # installation of locales will trigger locale-gen.
   apt-get install -y --no-install-recommends locales && \
-  locale-gen && \
   rm -rf /tmp/* /var/tmp/* /var/lib/{apt,dpkg,cache,log}/ && \
   mkdir -p /home/www/.composer/cache/ && \
   mkdir -p /home/www/.ssh/ && \
