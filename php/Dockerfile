@@ -30,13 +30,10 @@ COPY --from=builder /usr/local/bin/jpegtran /usr/local/bin/jpegtran
 COPY --from=builder /etc/mozjpeg/lib64 /etc/mozjpeg/lib64
 COPY --from=builder /usr/local/bin/mhsendmail /usr/local/bin/mhsendmail
 
-ADD ./helper/php8-amqp.sh /tmp/php8-amqp.sh
 ADD https://raw.githubusercontent.com/mlocati/docker-php-extension-installer/master/install-php-extensions /usr/local/bin/
 RUN \
   php -v && \
   chmod +x /usr/local/bin/install-php-extensions && sync && \
-  chmod +x /tmp/php8-amqp.sh && \
-  eval $(/tmp/php8-amqp.sh env) && \
   install-php-extensions ${PHP_EXTENSIONS} && \
   rm -f /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini && \
   savedAptMark="$(apt-mark showmanual)" && \
@@ -56,8 +53,6 @@ RUN \
   apt-mark manual $savedAptMark $pkgPersistent && \
   apt-get purge -y --auto-remove && \
   apt-get install -y $pkgPersistent --no-install-recommends && \
-  /tmp/php8-amqp.sh build && \
-  unset INSTALL_AMQP8 && \
   rm -rf /tmp/* /var/tmp/* /var/lib/{apt,dpkg,cache,log}/
 
 FROM extensions as stage1

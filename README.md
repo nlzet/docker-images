@@ -26,10 +26,6 @@ This repository serves as an easy way to configure and build docker PHP images (
 
 All tags are built weekly (on Thursday) based on the official php `major.minor` php tags (e.g. `php:7.4-fpm`). The following defaults are applied to these builds:
 
-*todo*: currently unsupported php8 extensions (https://github.com/mlocati/docker-php-extension-installer#supported-php-extensions)
-
-* xmlrpc
-
 | Option | Value |
 |--|--|
 | PHP_EXTENSIONS | `amqp bcmath bz2 exif gd gettext gmp igbinary imagick intl mcrypt mongodb mysqli pdo_mysql pdo_pgsql redis sockets soap xdebug xmlrpc xsl zip` |
