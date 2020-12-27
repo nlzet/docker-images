@@ -141,3 +141,4 @@ RUN yarn global add @api-platform/client-generator && \
   rm -rf /tmp/* /var/tmp/* /var/lib/{apt,dpkg,cache,log}/
 
 CMD ["php", "-a"]
+USER root
