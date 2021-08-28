@@ -18,7 +18,7 @@ php7.3:
     - ./run.sh build cli stage1 "--no-cache"
     - ./run.sh build fpm stage2
     - ./run.sh build ci stage3
-    - docker run -w /var/www/php/test/ -v /tmp/composercache/:/home/www/.composer/cache/ -v $(pwd)/:/var/www -i ${DOCKER_PREFIX}:${PHP_VERSION}-cli composer install
+    - docker run -w /var/www/php/test/ -v /tmp/composercache/:/home/www/.composer/cache/ -v $(pwd)/:/var/www -i ${DOCKER_PREFIX}:${PHP_VERSION}-cli composer update -W
     - ./run.sh testxdebug
     - ./run.sh push cli
     - ./run.sh push fpm
@@ -44,7 +44,7 @@ php7.4:
     - ./run.sh build cli stage1 "--no-cache"
     - ./run.sh build fpm stage2
     - ./run.sh build ci stage3
-    - docker run -w /var/www/php/test/ -v /tmp/composercache/:/home/www/.composer/cache/ -v $(pwd)/:/var/www -i ${DOCKER_PREFIX}:${PHP_VERSION}-cli composer install
+    - docker run -w /var/www/php/test/ -v /tmp/composercache/:/home/www/.composer/cache/ -v $(pwd)/:/var/www -i ${DOCKER_PREFIX}:${PHP_VERSION}-cli composer update -W
     - ./run.sh testxdebug
     - ./run.sh push cli
     - ./run.sh push fpm
@@ -70,9 +70,7 @@ php8.0:
     - ./run.sh build cli stage1 "--no-cache"
     - ./run.sh build fpm stage2
     - ./run.sh build ci stage3
-    # todo: remove when composer dependencies support PHP 8
-    - docker run -w /var/www/php/test/ -v /tmp/composercache/:/home/www/.composer/cache/ -v $(pwd)/:/var/www -i ${DOCKER_PREFIX}:${PHP_VERSION}-cli composer config platform.php "7.3"
-    - docker run -w /var/www/php/test/ -v /tmp/composercache/:/home/www/.composer/cache/ -v $(pwd)/:/var/www -i ${DOCKER_PREFIX}:${PHP_VERSION}-cli composer install
+    - docker run -w /var/www/php/test/ -v /tmp/composercache/:/home/www/.composer/cache/ -v $(pwd)/:/var/www -i ${DOCKER_PREFIX}:${PHP_VERSION}-cli composer update -W
     - ./run.sh testxdebug
     - ./run.sh push cli
     - ./run.sh push fpm
@@ -93,7 +91,7 @@ php8.1:
   script:
     - apk update && apk add tar sudo
     - export PHP_VERSION=8.1
-    # todo: remove when php 8.1 has stable tags
+    # todo: remove FROM_IMAGE var when php 8.1 images have stable tags
     - export FROM_IMAGE=php:8.1-rc-fpm
     - export DOCKER_PREFIX=nlzet/php
     - docker login --username=$DOCKER_HUB_USERNAME --password=$DOCKER_HUB_PASSWORD
@@ -101,8 +99,8 @@ php8.1:
     - ./run.sh build fpm stage2
     - ./run.sh build ci stage3
     # todo: remove when composer dependencies support PHP 8.1
-    - docker run -w /var/www/php/test/ -v /tmp/composercache/:/home/www/.composer/cache/ -v $(pwd)/:/var/www -i ${DOCKER_PREFIX}:${PHP_VERSION}-cli composer config platform.php "7.3"
-    - docker run -w /var/www/php/test/ -v /tmp/composercache/:/home/www/.composer/cache/ -v $(pwd)/:/var/www -i ${DOCKER_PREFIX}:${PHP_VERSION}-cli composer install
+    - docker run -w /var/www/php/test/ -v /tmp/composercache/:/home/www/.composer/cache/ -v $(pwd)/:/var/www -i ${DOCKER_PREFIX}:${PHP_VERSION}-cli composer config platform.php "8.0"
+    - docker run -w /var/www/php/test/ -v /tmp/composercache/:/home/www/.composer/cache/ -v $(pwd)/:/var/www -i ${DOCKER_PREFIX}:${PHP_VERSION}-cli composer update -W
     - ./run.sh testxdebug
     - ./run.sh push cli
     - ./run.sh push fpm
