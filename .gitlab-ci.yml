@@ -85,3 +85,31 @@ php8.0:
   services:
     - name: docker:dind
       alias: docker
+
+php8.1:
+  tags: ["docker"]
+  stage: build
+  image: docker
+  script:
+    - apk update && apk add tar sudo
+    - export PHP_VERSION=8.1
+    - export DOCKER_PREFIX=nlzet/php
+    - docker login --username=$DOCKER_HUB_USERNAME --password=$DOCKER_HUB_PASSWORD
+    - ./run.sh build cli stage1 "--no-cache"
+    - ./run.sh build fpm stage2
+    - ./run.sh build ci stage3
+    # todo: remove when composer dependencies support PHP 8
+    - docker run -w /var/www/php/test/ -v /tmp/composercache/:/home/www/.composer/cache/ -v $(pwd)/:/var/www -i ${DOCKER_PREFIX}:${PHP_VERSION}-cli composer config platform.php "8.1"
+    - docker run -w /var/www/php/test/ -v /tmp/composercache/:/home/www/.composer/cache/ -v $(pwd)/:/var/www -i ${DOCKER_PREFIX}:${PHP_VERSION}-cli composer install
+    - ./run.sh testxdebug
+    - ./run.sh push cli
+    - ./run.sh push fpm
+    - ./run.sh push ci
+  artifacts:
+    paths:
+      - php/test/data/out_*
+    expire_in: 7 days
+    when: always
+  services:
+    - name: docker:dind
+      alias: docker

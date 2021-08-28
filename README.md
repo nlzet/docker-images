@@ -23,6 +23,9 @@ This repository serves as an easy way to configure and build docker PHP images (
 | [nlzet/php:8.0-cli](https://hub.docker.com/r/nlzet/php/tags) | stage1 |
 | [nlzet/php:8.0-fpm](https://hub.docker.com/r/nlzet/php/tags) | stage2 |
 | [nlzet/php:8.0-ci](https://hub.docker.com/r/nlzet/php/tags) | stage3 |
+| [nlzet/php:8.1-cli](https://hub.docker.com/r/nlzet/php/tags) | stage1 |
+| [nlzet/php:8.1-fpm](https://hub.docker.com/r/nlzet/php/tags) | stage2 |
+| [nlzet/php:8.1-ci](https://hub.docker.com/r/nlzet/php/tags) | stage3 |
 
 All tags are built weekly (on Thursday) based on the official php `major.minor` php tags (e.g. `php:7.4-fpm`). The following defaults are applied to these builds:
 
