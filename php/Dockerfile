@@ -121,7 +121,7 @@ ARG GID
 
 USER root
 RUN \
-    pkgLib='ansible chromium libgtk2.0-0 libgtk-3-0 libgbm-dev libnotify-dev libgconf-2-4 libnss3 libxss1 libasound2 libxtst6 python-minimal python-setuptools software-properties-common sudo xauth xvfb' && \
+    pkgLib='ansible chromium libgtk2.0-0 libgtk-3-0 libgbm-dev libnotify-dev libgconf-2-4 libnss3 libxss1 libasound2 libxtst6 python python-setuptools software-properties-common sudo xauth xvfb' && \
     pkgDel='' && \
     set -x && \
     apt-get update && apt-get install -y $pkgLib --no-install-recommends && \
