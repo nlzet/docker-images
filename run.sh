@@ -1,8 +1,5 @@
 #!/usr/bin/env sh
 
-# print commands to output
-set -x
-
 # configuration defaults
 PHP_VERSION=${PHP_VERSION:-7.4}
 DOCKER_PREFIX=${DOCKER_PREFIX:-nlzet/php}
@@ -25,12 +22,17 @@ prepare() {
 
   # print configuration
   echo " "
+  echo "=== BUILD CONFIGURATION === "
+  echo " "
   echo "PHP_VERSION: ${PHP_VERSION} (${PHP_VERSION_MAJOR}.${PHP_VERSION_MINOR}.${PHP_VERSION_RELEASE})"
   echo "PHP_EXTENSIONS: ${PHP_EXTENSIONS}"
   echo "FROM_IMAGE: ${FROM_IMAGE}"
   echo "DOCKER_PREFIX: ${DOCKER_PREFIX}"
   echo "DOCKER_TAG: ${DOCKER_TAG}"
   echo " "
+
+  # print commands to output
+  set -x
 }
 
 buildimage () {

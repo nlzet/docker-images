@@ -30,7 +30,7 @@ COPY --from=builder /usr/local/bin/jpegtran /usr/local/bin/jpegtran
 COPY --from=builder /etc/mozjpeg/lib64 /etc/mozjpeg/lib64
 COPY --from=builder /usr/local/bin/mhsendmail /usr/local/bin/mhsendmail
 
-ADD https://raw.githubusercontent.com/mlocati/docker-php-extension-installer/master/install-php-extensions /usr/local/bin/
+ADD https://github.com/mlocati/docker-php-extension-installer/releases/latest/download/install-php-extensions /usr/local/bin/
 RUN \
   php -v && \
   chmod +x /usr/local/bin/install-php-extensions && sync && \
