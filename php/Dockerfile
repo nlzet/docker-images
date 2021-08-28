@@ -40,6 +40,7 @@ RUN \
   pkgPersistent='curl git git-core gifsicle imagemagick jpegoptim less libfreetype6 libjpeg62-turbo libmagic1 libpng16-16 librabbitmq4 libssl1.1 libxrender1 libzstd1 make nano openssl optipng pngcrush pngquant rsync ssh-client unzip vim wget wkhtmltox xfonts-75dpi xfonts-base xfonts-encodings' && \
   set -x && \
   apt-get update && \
+  apt-get install -y wget && \
   wget -qq https://github.com/wkhtmltopdf/wkhtmltopdf/releases/download/0.12.5/wkhtmltox_0.12.5-1.buster_amd64.deb && \
   (dpkg -i wkhtmltox_0.12.5-1.buster_amd64.deb 2>&1 || apt install -yf) && \
   apt-get install -y $pkgPersistent --no-install-recommends && \

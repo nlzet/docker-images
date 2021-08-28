@@ -94,6 +94,8 @@ php8.1:
     # todo: remove FROM_IMAGE var when php 8.1 images have stable tags
     - export FROM_IMAGE=php:8.1-rc-fpm
     - export DOCKER_PREFIX=nlzet/php
+    # todo: add mongodb extension when supported
+    - export PHP_EXTENSIONS="@composer amqp gd bcmath bz2 exif gd gettext gmp igbinary imagick intl mcrypt mysqli pdo_mysql pdo_pgsql redis sockets soap xdebug xsl zip"
     - docker login --username=$DOCKER_HUB_USERNAME --password=$DOCKER_HUB_PASSWORD
     - ./run.sh build cli stage1 "--no-cache"
     - ./run.sh build fpm stage2
