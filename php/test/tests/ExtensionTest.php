@@ -158,7 +158,7 @@ final class ExtensionTest extends TestCase
             ],
             [
                 'cmd' => ['/usr/local/bin/jpegtran', '-v', '--help'],
-                'output' => 'mozjpeg version 3.',
+                'output' => 'mozjpeg version 4.',
                 'catch' => true,
             ],
         ];
