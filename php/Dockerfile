@@ -9,13 +9,16 @@ FROM debian:buster-slim AS builder
 
 # build extra image optim libraries
 RUN \
-  pkgVolatile='wget build-essential cmake gcc libc6-dev make libfreetype6-dev libicu-dev libjpeg-dev libjpeg62-turbo-dev libpng-dev zlib1g-dev libxrender1 libssl-dev autoconf automake libtool pkgconf nasm xfonts-75dpi xfonts-base' && \
+  pkgVolatile='autoconf automake build-essential cmake gcc git libc6-dev libfreetype6-dev libicu-dev libjpeg-dev libjpeg62-turbo-dev libpng-dev libssl-dev libtool libxrender1 make nasm pkgconf texinfo wget xfonts-75dpi xfonts-base zlib1g-dev' && \
   pkgPersistent='fontconfig libxext6 libfontconfig1 ca-certificates openssl libjpeg62-turbo make' && \
   set -x && \
-  apt-get update && apt-get install -y $pkgVolatile $pkgPersistent --no-install-recommends && \
+  apt-get update && apt-get install -y $pkgVolatile $pkgPersistent --no-install-recommends
+
+RUN \
   wget -qq -O /usr/local/bin/mhsendmail https://github.com/mailhog/mhsendmail/releases/download/v0.2.0/mhsendmail_linux_amd64 && \
   chmod +x /usr/local/bin/mhsendmail && \
-  mkdir -p /tmp/mozjpeg && cd /tmp/mozjpeg && wget -qq https://github.com/mozilla/mozjpeg/archive/v3.3.1.tar.gz && tar -xzf v3.3.1.tar.gz && SRC_DIR=$(ls -t1 -d mozjpeg-* | head -n1) && cd $SRC_DIR && autoreconf -fiv && cd .. && sh $SRC_DIR/configure && make install prefix=/usr/local libdir=/etc/mozjpeg/lib64 && \
+  mkdir -p /tmp/mozjpeg && git clone --quiet --depth=1 https://github.com/mozilla/mozjpeg.git /tmp/mozjpeg && mkdir -p /tmp/mozjpeg/build && cd /tmp/mozjpeg/build && cmake -DCMAKE_INSTALL_PREFIX=/usr/local/ -DENABLE_STATIC=1 -DENABLE_SHARED=0 .. && make && make install && cd / && \
+  mkdir -p /tmp/webp && cd /tmp/webp && wget -qq -O libwebp.tar.gz https://storage.googleapis.com/downloads.webmproject.org/releases/webp/libwebp-1.2.2-rc2-linux-x86-64.tar.gz && gunzip -c libwebp.tar.gz | tar x --strip-components=1 && cp -v /tmp/webp/bin/* /usr/local/bin/ && cd / && rm -rf /tmp/webp && \
   apt-get purge -y --auto-remove $pkgVolatile && \
   rm -rf /tmp/* /var/tmp/* /var/lib/{apt,dpkg,cache,log}/
 
@@ -27,8 +30,19 @@ ARG UID
 ARG GID
 
 COPY --from=builder /usr/local/bin/jpegtran /usr/local/bin/jpegtran
-COPY --from=builder /etc/mozjpeg/lib64 /etc/mozjpeg/lib64
+#COPY --from=builder /etc/mozjpeg/lib64 /etc/mozjpeg/lib64
 COPY --from=builder /usr/local/bin/mhsendmail /usr/local/bin/mhsendmail
+COPY --from=builder /usr/local/bin/anim_diff /usr/local/bin/anim_diff
+COPY --from=builder /usr/local/bin/anim_dump /usr/local/bin/anim_dump
+COPY --from=builder /usr/local/bin/cwebp /usr/local/bin/cwebp
+COPY --from=builder /usr/local/bin/dwebp /usr/local/bin/dwebp
+COPY --from=builder /usr/local/bin/get_disto /usr/local/bin/get_disto
+COPY --from=builder /usr/local/bin/gif2webp /usr/local/bin/gif2webp
+COPY --from=builder /usr/local/bin/img2webp /usr/local/bin/img2webp
+COPY --from=builder /usr/local/bin/vwebp /usr/local/bin/vwebp
+COPY --from=builder /usr/local/bin/webpinfo /usr/local/bin/webpinfo
+COPY --from=builder /usr/local/bin/webpmux /usr/local/bin/webpmux
+COPY --from=builder /usr/local/bin/webp_quality /usr/local/bin/webp_quality
 
 ADD https://github.com/mlocati/docker-php-extension-installer/releases/latest/download/install-php-extensions /usr/local/bin/
 RUN \
