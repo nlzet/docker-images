@@ -184,6 +184,10 @@ final class ExtensionTest extends TestCase
                 $output = $process->getErrorOutput();
             }
 
+            if (is_array($output)) {
+                $output = implode("\r\n", $output);
+            }
+
             $this->assertStringContainsString($opts['output'], $output, sprintf(
                 'The command "%s" did not output the expected string "%s"',
                 $opts['cmd'],
