@@ -124,7 +124,10 @@ final class ExtensionTest extends TestCase
             setlocale(LC_ALL, $locale);
         }
 
-        $this->assertEquals($expectedJanuaryTranslation, strftime('%B', strtotime('2020/03/01')));
+        $formatter = new \IntlDateFormatter($locale, \IntlDateFormatter::FULL, \IntlDateFormatter::FULL);
+        $formatter->setPattern('MMMM');
+
+        $this->assertEquals($expectedJanuaryTranslation, $formatter->format(strtotime('2020/03/01')));
     }
 
     public function testRedis(): void
@@ -173,6 +176,11 @@ final class ExtensionTest extends TestCase
         ];
 
         foreach ($processChecks as $opts) {
+            $cmdLine = $opts['cmd'];
+            if (is_array($cmdLine)) {
+                $cmdLine = implode(' ', $cmdLine);
+            }
+
             $process = new Process($opts['cmd']);
 
             $process->enableOutput();
@@ -190,7 +198,7 @@ final class ExtensionTest extends TestCase
 
             $this->assertStringContainsString($opts['output'], $output, sprintf(
                 'The command "%s" did not output the expected string "%s"',
-                $opts['cmd'],
+                $cmdLine,
                 $output
             ));
         }
