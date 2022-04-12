@@ -2,8 +2,6 @@
 
 namespace Nlzet\Tests;
 
-use ImageOptimizer\Command;
-use ImageOptimizer\CommandOptimizer;
 use ImageOptimizer\Exception\Exception as OptimizeException;
 use ImageOptimizer\OptimizerFactory;
 use Knp\Snappy\Pdf;
@@ -83,7 +81,7 @@ final class ExtensionTest extends TestCase
 
     public function testExif(): void
     {
-        $fp = fopen(__DIR__.'/../data/sample2.jpg', 'rb');
+        $fp = fopen(__DIR__.'/../data/example.jpg', 'rb');
         if (!$fp) {
             throw new \Exception('Error: Unable to open image for reading');
         }
@@ -91,7 +89,7 @@ final class ExtensionTest extends TestCase
         $data = exif_read_data($fp);
         fclose($fp);
 
-        $this->assertEquals('sample2.jpg', $data['FileName'] ?? '');
+        $this->assertEquals('example.jpg', $data['FileName'] ?? '');
     }
 
     public function testIntl(): void
@@ -104,7 +102,7 @@ final class ExtensionTest extends TestCase
         $this->assertEquals('€ 1.234.567,89', $generated);
     }
 
-    public function provideLocaleTests()
+    public function provideLocaleTests() 
     {
         return [
             [null, 'March'],
@@ -140,8 +138,6 @@ final class ExtensionTest extends TestCase
         $this->assertTrue(file_exists('/usr/local/bin/gifsicle'));
         $this->assertTrue(file_exists('/usr/local/bin/jpegoptim'));
         $this->assertTrue(file_exists('/usr/local/bin/jpegtran'));
-        $this->assertTrue(file_exists('/usr/local/bin/cwebp'));
-        $this->assertTrue(file_exists('/usr/local/bin/dwebp'));
 
         $processChecks = [
             [
@@ -162,19 +158,13 @@ final class ExtensionTest extends TestCase
             ],
             [
                 'cmd' => ['/usr/local/bin/jpegtran', '-v', '--help'],
-                'output' => 'mozjpeg version 4.',
+                'output' => 'mozjpeg version 3.',
                 'catch' => true,
-            ],
-            [
-                'cmd' => ['/usr/local/bin/cwebp', '-version'],
-                'output' => '1.2.2',
-                'catch' => false,
             ],
         ];
 
         foreach ($processChecks as $opts) {
             $process = new Process($opts['cmd']);
-
             $process->enableOutput();
             $process->run();
 
@@ -184,11 +174,7 @@ final class ExtensionTest extends TestCase
                 $output = $process->getErrorOutput();
             }
 
-            $this->assertStringContainsString($opts['output'], $output, sprintf(
-                'The command "%s" did not output the expected string "%s"',
-                $opts['cmd'],
-                $output
-            ));
+            $this->assertStringContainsString($opts['output'], $output);
         }
     }
 
@@ -196,7 +182,7 @@ final class ExtensionTest extends TestCase
     {
         $targetW = 320;
         $targetH = 240;
-        $filePath = __DIR__.'/../data/sample2.jpg';
+        $filePath = __DIR__.'/../data/example.jpg';
         $fileTargetPath = __DIR__.'/../data/example_resized.jpg';
         $resource = imagecreatefromjpeg($filePath);
         $oldw = imagesx($resource);
@@ -225,7 +211,6 @@ final class ExtensionTest extends TestCase
             [__DIR__.'/../data/sample.jpeg', 'jpegtran', ['optimizers' => ['jpegtran']]],
             [__DIR__.'/../data/sample.png', 'optipng', ['optimizers' => ['optipng']]],
             [__DIR__.'/../data/sample.png', 'pngquant', ['optimizers' => ['pngquant']]],
-            [__DIR__.'/../data/sample.webp', 'cwebp', ['optimizers' => ['webp']]],
         ];
     }
 
@@ -273,9 +258,6 @@ final class ExtensionTest extends TestCase
                         $options['jpegtran_bin'] = $optimizers[] = '/usr/local/bin/jpegtran';
                         $command = sprintf('%s %s', end($optimizers), implode(' ', $options['jpegtran_options'] ?? []));
                         break;
-                    case 'webp':
-                        // ignore, webp is handled seperately.
-                        break;
                     default:
                         throw new \Exception(sprintf('Unknown optimizer "%s"', $optimizer));
                 }
@@ -292,17 +274,7 @@ final class ExtensionTest extends TestCase
         clearstatcache();
         $sizeBefore = filesize($filePath);
 
-        if ('cwebp' === $optimizerName) {
-            $optimizer = new CommandOptimizer(
-                new Command('cwebp', ['-quiet', '-m', 6, '-pass', 10, '-mt', '-o',], 60),
-                function($filepath){
-                    return [$filepath, $filepath];
-                }
-            );
-        } else {
-            $optimizer = $factory->get($optimizerName);
-        }
-
+        $optimizer = $factory->get($optimizerName);
         $errorMessage = sprintf(
             'Unsuccesfull optimize: %s (optimizers: %s). Command: %s',
             $filePath,
