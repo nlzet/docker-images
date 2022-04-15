@@ -69,6 +69,18 @@ RUN \
   apt-get install -y $pkgPersistent --no-install-recommends && \
   rm -rf /tmp/* /var/tmp/* /var/lib/{apt,dpkg,cache,log}/
 
+# php/composer version alias
+RUN \
+  export tmp_php_version=$(echo $PHP_VERSION | cut -d "." -f1-2 | sed 's/\.//g') && \
+  echo "-> alias version: ${tmp_php_version}" && \
+  ln -sf /usr/local/bin/php /usr/local/bin/php${tmp_php_version} && \
+  ln -sf /usr/local/bin/composer /usr/local/bin/composer${tmp_php_version} && \
+  echo "> php alias version: " && \
+  $(echo php$tmp_php_version --version) && \
+  echo "> composer alias version: " && \
+  $(echo composer$tmp_php_version --version) && \
+  export tmp_php_version=
+
 FROM extensions as stage1
 ARG PHP_VERSION
 ARG PHP_EXTENSIONS
