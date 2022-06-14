@@ -121,7 +121,7 @@ php8.2:
     - export PHP_VERSION=8.2
     - export DOCKER_PREFIX=nlzet/php
     # todo: stable base image
-    - export FROM_IMAGE=php:8.2.0alpha1
+    - export FROM_IMAGE=php:8.2.0alpha1-fpm
     # todo: support extensions
     # - export PHP_EXTENSIONS="amqp imagick mcrypt mongodb redis xdebug"
     - export PHP_EXTENSIONS="@composer gd bcmath bz2 exif gd gettext gmp igbinary intl mysqli opcache pdo_mysql pdo_pgsql sockets soap xsl zip"
