@@ -109,3 +109,37 @@ php8.1:
   services:
     - name: docker:dind
       alias: docker
+
+php8.2:
+  tags: ["docker"]
+  stage: build
+  image: docker
+  # todo: remove when stable and all extension supported
+  allow_failure: true
+  script:
+    - apk update && apk add tar sudo
+    - export PHP_VERSION=8.2
+    - export DOCKER_PREFIX=nlzet/php
+    # todo: stable base image
+    - export FROM_IMAGE=php:8.2.0alpha1
+    # todo: support extensions
+    # - export PHP_EXTENSIONS="amqp imagick mcrypt mongodb redis xdebug"
+    - export PHP_EXTENSIONS="@composer gd bcmath bz2 exif gd gettext gmp igbinary intl mysqli opcache pdo_mysql pdo_pgsql sockets soap xsl zip"
+    - docker login --username=$DOCKER_HUB_USERNAME --password=$DOCKER_HUB_PASSWORD
+    - ./run.sh build cli stage1 "--no-cache"
+    - ./run.sh build fpm stage2
+    - ./run.sh build ci stage3
+    # todo: enable tests
+    # - docker run -w /var/www/php/test/ -v /tmp/composercache/:/home/www/.composer/cache/ -v $(pwd)/:/var/www -i ${DOCKER_PREFIX}:${PHP_VERSION}-cli composer update -W
+    # - ./run.sh testxdebug
+    - ./run.sh push cli
+    - ./run.sh push fpm
+    - ./run.sh push ci
+  artifacts:
+    paths:
+      - php/test/data/out_*
+    expire_in: 7 days
+    when: always
+  services:
+    - name: docker:dind
+      alias: docker
