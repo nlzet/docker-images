@@ -122,9 +122,6 @@ php8.2:
     - export DOCKER_PREFIX=nlzet/php
     # todo: stable base image
     - export FROM_IMAGE=php:8.2.0beta3-fpm
-    # todo: support extensions
-    # - export PHP_EXTENSIONS="amqp imagick mcrypt mongodb redis xdebug"
-    - export PHP_EXTENSIONS="@composer amqp gd bcmath bz2 exif gd gettext gmp igbinary imagick intl mcrypt mongodb mysqli opcache pdo_mysql pdo_pgsql redis sockets soap xdebug xsl zip"
     - docker login --username=$DOCKER_HUB_USERNAME --password=$DOCKER_HUB_PASSWORD
     - ./run.sh build cli stage1 "--no-cache"
     - ./run.sh build fpm stage2
