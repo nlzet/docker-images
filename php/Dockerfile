@@ -155,9 +155,9 @@ RUN \
     apt-get purge -y --auto-remove $pkgDel && \
     rm -rf /tmp/* /var/tmp/* /var/lib/{apt,dpkg,cache,log}/ && \
     wget https://get.symfony.com/cli/installer -O - | bash && \
-    mv ~/.symfony/bin/symfony /usr/local/bin/symfony && \
+    mv ~/.symfony5/bin/symfony /usr/local/bin/symfony && \
     /usr/local/bin/symfony server:ca:install && \
-    cp -r /root/.symfony/ /home/www/ && \
+    cp -r /root/.symfony5/ /home/www/ && \
     chown -R $UID:$GID /home/www/ && \
     wget -O /usr/local/bin/wait-for-it https://raw.githubusercontent.com/vishnubob/wait-for-it/master/wait-for-it.sh && \
     chmod +x /usr/local/bin/wait-for-it
