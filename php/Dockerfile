@@ -160,11 +160,13 @@ RUN \
     cp -r /root/.symfony5/ /home/www/ && \
     chown -R $UID:$GID /home/www/ && \
     wget -O /usr/local/bin/wait-for-it https://raw.githubusercontent.com/vishnubob/wait-for-it/master/wait-for-it.sh && \
-    chmod +x /usr/local/bin/wait-for-it
+    chmod +x /usr/local/bin/wait-for-it && 
+    chown -vR $UID:$GID /tmp/
 
 USER www
 ENV PATH="${PATH}:/home/www/.yarn/bin/"
-RUN yarn global add @api-platform/client-generator @quasar/cli cypress && \
+RUN 
+  yarn global add @api-platform/client-generator @quasar/cli cypress && \
   yarn cache clean && \
   rm -rf /tmp/* /var/tmp/* /var/lib/{apt,dpkg,cache,log}/
 
