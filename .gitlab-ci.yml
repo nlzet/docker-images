@@ -11,6 +11,7 @@ php7.3:
   stage: build
   image: docker
   script:
+    - cp -vf php/test/phpunit.9.xml.dist php/test/phpunit.xml.dist
     - apk update && apk add tar sudo
     - export PHP_VERSION=7.3
     - export DOCKER_PREFIX=nlzet/php
@@ -37,6 +38,7 @@ php7.4:
   stage: build
   image: docker
   script:
+    - cp -vf php/test/phpunit.9.xml.dist php/test/phpunit.xml.dist
     - apk update && apk add tar sudo
     - export PHP_VERSION=7.4
     - export DOCKER_PREFIX=nlzet/php
@@ -63,6 +65,7 @@ php8.0:
   stage: build
   image: docker
   script:
+    - cp -vf php/test/phpunit.10.xml.dist php/test/phpunit.xml.dist
     - apk update && apk add tar sudo
     - export PHP_VERSION=8.0
     - export DOCKER_PREFIX=nlzet/php
@@ -89,6 +92,7 @@ php8.1:
   stage: build
   image: docker
   script:
+    - cp -vf php/test/phpunit.10.xml.dist php/test/phpunit.xml.dist
     - apk update && apk add tar sudo
     - export PHP_VERSION=8.1
     - export DOCKER_PREFIX=nlzet/php
@@ -117,6 +121,7 @@ php8.2:
   # todo: remove when stable and all extension supported
   allow_failure: true
   script:
+    - cp -vf php/test/phpunit.10.xml.dist php/test/phpunit.xml.dist
     - apk update && apk add tar sudo
     - export PHP_VERSION=8.2
     - export DOCKER_PREFIX=nlzet/php
