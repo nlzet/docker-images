@@ -104,3 +104,32 @@ Available options and information are described below:
     
     # start fpm container, wich will directly start php-fpm
     docker run -it nlzet/php:7.3-fpm    
+
+## Docker pull all:
+
+    versions=(7.3 7.4 8.0 8.1 8.2)
+    tags=(ci fpm cli)
+
+    for version in $versions
+    do
+        for tag in $tags
+        do
+            echo "pulling nlzet/php:$version-$tag"
+            docker pull nlzet/php:$version-$tag
+        done
+    done
+
+# Check composer / php versions
+
+    versions=(7.3 7.4 8.0 8.1 8.2)
+    tags=(ci fpm cli)
+
+    for version in $versions
+    do
+        for tag in $tags
+        do
+            echo "checking versions for nlzet/php:$version-$tag"
+            cmd='$(php -v | head -n 1) - $(composer --version)'
+            docker run -it nlzet/php:$version-$tag bash -c "echo $(echo $cmd)"
+        done
+    done
