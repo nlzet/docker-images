@@ -126,7 +126,7 @@ php8.2:
     - export PHP_VERSION=8.2
     - export DOCKER_PREFIX=nlzet/php
     # todo: stable base image
-    - export FROM_IMAGE=php:8.2.0beta3-fpm
+    - export FROM_IMAGE=php:8.2.0RC1-fpm
     - docker login --username=$DOCKER_HUB_USERNAME --password=$DOCKER_HUB_PASSWORD
     - ./run.sh build cli stage1 "--no-cache"
     - ./run.sh build fpm stage2
