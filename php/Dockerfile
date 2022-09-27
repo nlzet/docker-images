@@ -125,7 +125,7 @@ ARG GID
 
 USER root
 RUN \
-  curl -sL https://deb.nodesource.com/setup_14.x | bash - && \
+  curl -sL https://deb.nodesource.com/setup_16.x | bash - && \
   curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | apt-key add - && \
   echo "deb https://dl.yarnpkg.com/debian/ stable main" | tee /etc/apt/sources.list.d/yarn.list && \
   apt-get update && \
@@ -166,7 +166,7 @@ RUN \
 USER www
 ENV PATH="${PATH}:/home/www/.yarn/bin/"
 RUN \
-  yarn global add @api-platform/client-generator @quasar/cli cypress@^8.7 && \
+  yarn global add @api-platform/client-generator @quasar/cli cypress && \
   yarn cache clean && \
   rm -rf /tmp/* /var/tmp/* /var/lib/{apt,dpkg,cache,log}/
 
