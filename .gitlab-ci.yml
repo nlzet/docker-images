@@ -125,8 +125,6 @@ php8.2:
     - apk update && apk add tar sudo
     - export PHP_VERSION=8.2
     - export DOCKER_PREFIX=nlzet/php
-    # todo: stable base image
-    - export FROM_IMAGE=php:8.2.0RC1-fpm
     - docker login --username=$DOCKER_HUB_USERNAME --password=$DOCKER_HUB_PASSWORD
     - ./run.sh build cli stage1 "--no-cache"
     - ./run.sh build fpm stage2
