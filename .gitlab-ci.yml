@@ -118,8 +118,6 @@ php8.2:
   tags: ["docker"]
   stage: build
   image: docker
-  # todo: remove when stable and all extension supported
-  allow_failure: true
   script:
     - cp -vf php/test/phpunit.10.xml.dist php/test/phpunit.xml.dist
     - apk update && apk add tar sudo
