@@ -31,7 +31,7 @@ All tags are built weekly (on Thursday) based on the official php `major.minor` 
 
 | Option | Value |
 |--|--|
-| PHP_EXTENSIONS | `amqp bcmath bz2 exif gd gettext gmp igbinary imagick intl mcrypt mongodb mysqli pdo_mysql pdo_pgsql redis sockets soap xdebug xmlrpc xsl zip` |
+| PHP_EXTENSIONS | `amqp bcmath bz2 exif gd gettext gmp igbinary imagick intl mcrypt mongodb mysqli pcntl pdo_mysql pdo_pgsql redis sockets soap xdebug xmlrpc xsl zip` |
 | FROM_IMAGE | `php:${PHP_VERSION}-fpm` |
   
 # Building your own image  
