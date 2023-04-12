@@ -104,7 +104,7 @@ final class ExtensionTest extends TestCase
         $this->assertEquals('€ 1.234.567,89', $generated);
     }
 
-    public function provideLocaleTests()
+    public static function provideLocaleTests()
     {
         return [
             [null, 'March'],
@@ -228,7 +228,7 @@ final class ExtensionTest extends TestCase
         @unlink($fileTargetPath);
     }
 
-    public function provideImageOptimizeTests()
+    public static function provideImageOptimizeTests()
     {
         return [
             [__DIR__.'/../data/sample.jpg', 'jpegoptim', ['optimizers' => ['jpegoptim']]],
