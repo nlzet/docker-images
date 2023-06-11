@@ -126,11 +126,10 @@ ARG GID
 USER root
 RUN \
   curl -sL https://deb.nodesource.com/setup_16.x | bash - && \
-  curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | apt-key add - && \
-  echo "deb https://dl.yarnpkg.com/debian/ stable main" | tee /etc/apt/sources.list.d/yarn.list && \
   apt-get update && \
   # todo: sendmail msmtp
-  apt-get install -y --no-install-recommends nodejs yarn && \
+  apt-get install -y --no-install-recommends nodejs && \
+  npm install -g yarn pnpm npm@latest && \
   # Allow extension enable for the user "www"
   chown -R $UID:$GID /usr/local/etc/php/conf.d/ && \
   rm -rf /tmp/* /var/tmp/* /var/lib/{apt,dpkg,cache,log}/ && \
