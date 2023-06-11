@@ -107,7 +107,7 @@ Available options and information are described below:
 
 ## Docker pull all:
 
-    versions=(7.3 7.4 8.0 8.1 8.2)
+    versions=(7.3 7.4 8.1 8.2)
     tags=(ci fpm cli)
 
     for version in $versions
@@ -121,7 +121,7 @@ Available options and information are described below:
 
 # Check composer / php versions
 
-    versions=(7.3 7.4 8.0 8.1 8.2)
+    versions=(7.3 7.4 8.1 8.2)
     tags=(ci fpm cli)
 
     for version in $versions
