@@ -5,7 +5,7 @@ ARG LOCALEGEN="en_US.UTF-8 UTF-8\nnl_NL.UTF-8 UTF-8\nnl_BE.UTF-8 UTF-8\nfr_FR.UT
 ARG UID=1000
 ARG GID=1000
 
-FROM debian:buster-slim AS builder
+FROM debian:bookworm-slim AS builder
 
 # build extra image optim libraries
 RUN \
@@ -45,20 +45,27 @@ COPY --from=builder /usr/local/bin/webpmux /usr/local/bin/webpmux
 COPY --from=builder /usr/local/bin/webp_quality /usr/local/bin/webp_quality
 
 ADD https://github.com/mlocati/docker-php-extension-installer/releases/latest/download/install-php-extensions /usr/local/bin/
+
+# todo: bookworm instead of bullseye when available, and remove libssl1.1 buster backport.
+RUN echo "deb http://deb.debian.org/debian/ buster main" >> /etc/apt/sources.list.d/buster-repo.list
+RUN #echo 'Package: *\nPin: release o=Debian\nPin-Priority: -1' > /etc/apt/preferences.d/disable-buster-repo
+RUN apt update
+RUN apt install -t buster libssl1.1
+
 RUN \
   php -v && \
   chmod +x /usr/local/bin/install-php-extensions && sync && \
   install-php-extensions ${PHP_EXTENSIONS} && \
   rm -f /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini && \
   savedAptMark="$(apt-mark showmanual)" && \
-  pkgPersistent='curl git git-core gifsicle imagemagick jpegoptim less libfreetype6 libjpeg62-turbo libmagic1 libpng16-16 librabbitmq4 libssl1.1 libxrender1 libzstd1 make nano openssl optipng pngcrush pngquant rsync ssh-client unzip vim wget wkhtmltox xfonts-75dpi xfonts-base xfonts-encodings' && \
+  pkgPersistent='curl git git-core gifsicle imagemagick jpegoptim less libfreetype6 libjpeg62-turbo libmagic1 libpng16-16 librabbitmq4 libssl3 libxrender1 libzstd1 make nano openssl optipng pngcrush pngquant rsync ssh-client unzip vim wget wkhtmltox xfonts-75dpi xfonts-base xfonts-encodings' && \
   set -x && \
   apt-get update && \
   apt-get install -y wget && \
-  wget -qq https://github.com/wkhtmltopdf/wkhtmltopdf/releases/download/0.12.5/wkhtmltox_0.12.5-1.buster_amd64.deb && \
-  (dpkg -i wkhtmltox_0.12.5-1.buster_amd64.deb 2>&1 || apt install -yf) && \
+  wget -qq https://github.com/wkhtmltopdf/packaging/releases/download/0.12.6.1-2/wkhtmltox_0.12.6.1-2.bullseye_amd64.deb && \
+  (dpkg -i wkhtmltox_0.12.6.1-2.bullseye_amd64.deb 2>&1 || apt install -yf) && \
   apt-get install -y $pkgPersistent --no-install-recommends && \
-  rm -f wkhtmltox_0.12.5-1.buster_amd64.deb && \
+  rm -f wkhtmltox_0.12.6.1-2.bullseye_amd64.deb && \
   ln -sf /usr/bin/jpegoptim /usr/local/bin/jpegoptim && \
   ln -sf /usr/bin/optipng /usr/local/bin/optipng && \
   ln -sf /usr/bin/gifsicle /usr/local/bin/gifsicle && \

@@ -12,20 +12,20 @@ This repository serves as an easy way to configure and build docker PHP images (
 
 ## Default build options
 
-| Tag | Stage |
-|--|--|
-| [nlzet/php:7.3-cli](https://hub.docker.com/r/nlzet/php/tags) | stage1 |
-| [nlzet/php:7.3-fpm](https://hub.docker.com/r/nlzet/php/tags) | stage2 |
-| [nlzet/php:7.3-ci](https://hub.docker.com/r/nlzet/php/tags) | stage3 |
+| Tag                                                          | Stage |
+|--------------------------------------------------------------|--|
 | [nlzet/php:7.4-cli](https://hub.docker.com/r/nlzet/php/tags) | stage1 |
 | [nlzet/php:7.4-fpm](https://hub.docker.com/r/nlzet/php/tags) | stage2 |
-| [nlzet/php:7.4-ci](https://hub.docker.com/r/nlzet/php/tags) | stage3 |
+| [nlzet/php:7.4-ci](https://hub.docker.com/r/nlzet/php/tags)  | stage3 |
 | [nlzet/php:8.0-cli](https://hub.docker.com/r/nlzet/php/tags) | stage1 |
 | [nlzet/php:8.0-fpm](https://hub.docker.com/r/nlzet/php/tags) | stage2 |
-| [nlzet/php:8.0-ci](https://hub.docker.com/r/nlzet/php/tags) | stage3 |
+| [nlzet/php:8.0-ci](https://hub.docker.com/r/nlzet/php/tags)  | stage3 |
 | [nlzet/php:8.1-cli](https://hub.docker.com/r/nlzet/php/tags) | stage1 |
 | [nlzet/php:8.1-fpm](https://hub.docker.com/r/nlzet/php/tags) | stage2 |
-| [nlzet/php:8.1-ci](https://hub.docker.com/r/nlzet/php/tags) | stage3 |
+| [nlzet/php:8.1-ci](https://hub.docker.com/r/nlzet/php/tags)  | stage3 |
+| [nlzet/php:8.2-cli](https://hub.docker.com/r/nlzet/php/tags) | stage1 |
+| [nlzet/php:8.2-fpm](https://hub.docker.com/r/nlzet/php/tags) | stage2 |
+| [nlzet/php:8.2-ci](https://hub.docker.com/r/nlzet/php/tags)  | stage3 |
 
 All tags are built weekly (on Thursday) based on the official php `major.minor` php tags (e.g. `php:7.4-fpm`). The following defaults are applied to these builds:
 
@@ -84,30 +84,30 @@ Available options and information are described below:
 ### Check PHP configuration:
 
     # get version
-    docker run -it nlzet/php:7.3-cli php -v
+    docker run -it nlzet/php:8.2-cli php -v
     
     # list configured modules
-    docker run -it nlzet/php:7.3-cli php -m
+    docker run -it nlzet/php:8.2-cli php -m
     
     # list configured ini files
-    docker run -it nlzet/php:7.3-cli php --ini
+    docker run -it nlzet/php:8.2-cli php --ini
     
 ### Enable Xdebug:
     
     # command line argument
-    docker run -it nlzet/php:7.3-cli php -d zend_extension=xdebug.so -v
+    docker run -it nlzet/php:8.2-cli php -d zend_extension=xdebug.so -v
     
     # or with a mounted .ini file, containing "zend_extension=xdebug.so"
-    docker run -v $(pwd)/xdebug.ini:/usr/local/etc/php/conf.d/99-enable-xdebug.ini -it nlzet/php:7.3-cli php -v
+    docker run -v $(pwd)/xdebug.ini:/usr/local/etc/php/conf.d/99-enable-xdebug.ini -it nlzet/php:8.2-cli php -v
     
 ## FPM:
     
     # start fpm container, wich will directly start php-fpm
-    docker run -it nlzet/php:7.3-fpm    
+    docker run -it nlzet/php:8.2-fpm    
 
 ## Docker pull all:
 
-    versions=(7.3 7.4 8.1 8.2)
+    versions=(8.0 8.1 8.2)
     tags=(ci fpm cli)
 
     for version in $versions
@@ -121,7 +121,7 @@ Available options and information are described below:
 
 # Check composer / php versions
 
-    versions=(7.3 7.4 8.1 8.2)
+    versions=(8.0 8.1 8.2)
     tags=(ci fpm cli)
 
     for version in $versions
