@@ -142,7 +142,7 @@ RUN \
   apt-get install -y nodejs='16.20.2-1nodesource1' && \
   # todo: sendmail msmtp
 #  apt-get install -y --no-install-recommends nodejs && \
-  npm install -g npm@latest && \
+#  npm install -g npm@latest && \
   npm install -g yarn pnpm && \
   # Allow extension enable for the user "www"
   chown -R $UID:$GID /usr/local/etc/php/conf.d/ && \
