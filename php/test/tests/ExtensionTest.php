@@ -360,11 +360,11 @@ final class ExtensionTest extends TestCase
         $processChecks = [
             [
                 'cmd' => ['/usr/local/bin/wkhtmltopdf', '--version'],
-                'output' => 'wkhtmltopdf 0.12.5 (with patched qt)',
+                'output' => 'wkhtmltopdf 0.12.6.1 (with patched qt)',
             ],
             [
                 'cmd' => ['/usr/local/bin/wkhtmltoimage', '--version'],
-                'output' => 'wkhtmltoimage 0.12.5 (with patched qt)',
+                'output' => 'wkhtmltoimage 0.12.6.1 (with patched qt)',
             ],
         ];
 
