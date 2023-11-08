@@ -161,6 +161,9 @@ ARG GID
 
 USER root
 RUN \
+    wget -qq -O caddy.deb https://github.com/caddyserver/caddy/releases/download/v2.7.5/caddy_2.7.5_linux_amd64.deb && \
+    dpkg -i caddy.deb && \
+    rm -f caddy.deb && \
     echo 'deb http://dl.google.com/linux/chrome/deb/ stable main' > /etc/apt/sources.list.d/chrome.list && \
     wget -q -O - https://dl-ssl.google.com/linux/linux_signing_key.pub | apt-key add - && \
     pkgLib='ansible chromium gettext-base google-chrome-stable firefox-esr libgtk2.0-0 libgtk-3-0 libgbm-dev libnotify-dev libgconf-2-4 libnss3 libxss1 libasound2 libxtst6 python python-setuptools software-properties-common sudo xauth xvfb' && \
