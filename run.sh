@@ -7,7 +7,7 @@ DOCKER_PREFIX=${DOCKER_PREFIX:-nlzet/php}
 prepare() {
   # configure defaults if not set
   FROM_IMAGE=${FROM_IMAGE:-php:${PHP_VERSION}-fpm}
-  PHP_EXTENSIONS=${PHP_EXTENSIONS:-@composer amqp gd bcmath bz2 exif gd gettext gmp igbinary imagick intl mcrypt mysqli opcache pcntl pdo_mysql pdo_pgsql redis sockets soap xdebug xsl zip}
+  PHP_EXTENSIONS=${PHP_EXTENSIONS:-@composer amqp gd bcmath bz2 exif ffi gd gettext gmp igbinary imagick intl mcrypt mysqli opcache pcntl pdo_mysql pdo_pgsql redis sockets soap xdebug xsl zip}
 
   # parse PHP version number
   docker pull ${FROM_IMAGE} > /dev/null 2>&1
