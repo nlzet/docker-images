@@ -97,7 +97,7 @@ php8.3:
   script:
     - cp -vf php/test/phpunit.10.xml.dist php/test/phpunit.xml.dist
     - apk update && apk add tar sudo
-    - export PHP_VERSION=8.3.0RC4
+    - export PHP_VERSION=8.3.0RC6
     - export DOCKER_PREFIX=nlzet/php
     # skip imagick / mcrypt on php 8.3
     - export PHP_EXTENSIONS="@composer amqp gd bcmath bz2 exif ffi gd gettext gmp igbinary intl mysqli opcache pcntl pdo_mysql pdo_pgsql redis sockets soap xdebug xsl zip"
