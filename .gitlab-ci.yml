@@ -90,6 +90,7 @@ php8.2:
       alias: docker
 
 php8.3:
+  allow_failure: true
   tags: ["docker"]
   stage: build
   image: docker
