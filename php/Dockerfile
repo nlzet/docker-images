@@ -10,7 +10,7 @@ FROM debian:bookworm-slim AS builder
 # build extra image optim libraries
 RUN \
   pkgVolatile='autoconf automake build-essential cmake gcc git libc6-dev libfreetype6-dev libicu-dev libjpeg-dev libjpeg62-turbo-dev libpng-dev libssl-dev libtool libxrender1 make nasm pkgconf texinfo wget xfonts-75dpi xfonts-base zlib1g-dev' && \
-  pkgPersistent='fontconfig libxext6 libfontconfig1 ca-certificates openssl libjpeg62-turbo libvips42 libffi-dev make curl' && \
+  pkgPersistent='fontconfig libxext6 libfontconfig1 ca-certificates openssl libjpeg62-turbo make curl' && \
   set -x && \
   apt-get update && apt-get install -y $pkgVolatile $pkgPersistent --no-install-recommends
 
@@ -58,7 +58,7 @@ RUN \
   install-php-extensions ${PHP_EXTENSIONS} && \
   rm -f /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini && \
   savedAptMark="$(apt-mark showmanual)" && \
-  pkgPersistent='curl git git-core gifsicle imagemagick jpegoptim less libfreetype6 libjpeg62-turbo libmagic1 libpng16-16 librabbitmq4 libssl3 libxrender1 libzstd1 make nano openssl optipng pngcrush pngquant rsync ssh-client unzip vim wget wkhtmltox xfonts-75dpi xfonts-base xfonts-encodings' && \
+  pkgPersistent='curl git git-core gifsicle imagemagick jpegoptim less libfreetype6 libjpeg62-turbo libvips42 libffi-dev libmagic1 libpng16-16 librabbitmq4 libssl3 libxrender1 libzstd1 make nano openssl optipng pngcrush pngquant rsync ssh-client unzip vim wget wkhtmltox xfonts-75dpi xfonts-base xfonts-encodings' && \
   set -x && \
   apt-get update && \
   apt-get install -y wget && \
