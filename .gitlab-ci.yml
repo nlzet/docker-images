@@ -98,7 +98,7 @@ php8.3:
     - apk update && apk add tar sudo
     - export PHP_VERSION=8.3
     - export DOCKER_PREFIX=nlzet/php
-    # skip mcrypt on php 8.2
+    # skip mcrypt on php 8.3
     - export PHP_EXTENSIONS="@composer amqp bcmath bz2 exif ffi gd gettext gmp igbinary imagick intl mysqli pcntl pdo_mysql pdo_pgsql redis sockets soap xdebug xmlrpc xsl zip"
     - docker login --username=$DOCKER_HUB_USERNAME --password=$DOCKER_HUB_PASSWORD
     - ./run.sh build cli stage1 "--no-cache"
