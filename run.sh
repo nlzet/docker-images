@@ -3,6 +3,7 @@
 # configuration defaults
 PHP_VERSION=${PHP_VERSION:-7.4}
 DOCKER_PREFIX=${DOCKER_PREFIX:-nlzet/php}
+NODE_MAJOR=${NODE_MAJOR:-16}
 
 prepare() {
   # configure defaults if not set
@@ -29,6 +30,7 @@ prepare() {
   echo "FROM_IMAGE: ${FROM_IMAGE}"
   echo "DOCKER_PREFIX: ${DOCKER_PREFIX}"
   echo "DOCKER_TAG: ${DOCKER_TAG}"
+  echo "NODE_MAJOR: ${NODE_MAJOR}"
   echo " "
 
   # print commands to output
