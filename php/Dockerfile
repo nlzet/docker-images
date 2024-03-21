@@ -7,15 +7,23 @@ ARG GID=1000
 ARG NODE_MAJOR=16
 
 FROM debian:bookworm-slim AS builder
+ARG PHP_VERSION
+ARG PHP_EXTENSIONS
+ARG LOCALEGEN
+ARG UID
+ARG GID
+ARG NODE_MAJOR
 
 # build extra image optim libraries
 RUN \
   pkgVolatile='autoconf automake build-essential cmake gcc git libc6-dev libfreetype6-dev libicu-dev libjpeg-dev libjpeg62-turbo-dev libpng-dev libssl-dev libtool libxrender1 make nasm pkgconf texinfo wget xfonts-75dpi xfonts-base zlib1g-dev' && \
   pkgPersistent='fontconfig libxext6 libfontconfig1 ca-certificates openssl libjpeg62-turbo make curl' && \
   set -x && \
-  apt-get update && apt-get install -y $pkgVolatile $pkgPersistent --no-install-recommends
-
-RUN \
+  apt-get update && apt-get install -y $pkgVolatile $pkgPersistent --no-install-recommends && \
+  apt-get install -y gcc git curl gnupg gnupg2 ca-certificates && \
+  curl -fsSL https://deb.nodesource.com/gpgkey/nodesource-repo.gpg.key | gpg --dearmor -o /etc/apt/keyrings/nodesource.gpg && \
+  echo "deb [signed-by=/etc/apt/keyrings/nodesource.gpg] https://deb.nodesource.com/node_${NODE_MAJOR}.x nodistro main" | tee /etc/apt/sources.list.d/nodesource.list && \
+  echo cat /etc/apt/sources.list.d/nodesource.list && \
   wget -qq -O /usr/local/bin/mhsendmail https://github.com/mailhog/mhsendmail/releases/download/v0.2.0/mhsendmail_linux_amd64 && \
   chmod +x /usr/local/bin/mhsendmail && \
   mkdir -p /tmp/mozjpeg && git clone --quiet --depth=1 https://github.com/mozilla/mozjpeg.git /tmp/mozjpeg && mkdir -p /tmp/mozjpeg/build && cd /tmp/mozjpeg/build && cmake -DCMAKE_INSTALL_PREFIX=/usr/local/ -DENABLE_STATIC=1 -DENABLE_SHARED=0 .. && make && make install && cd / && \
@@ -135,10 +143,6 @@ ARG NODE_MAJOR
 
 USER root
 RUN \
-  apt-get update && \
-  apt-get install -y  gnupg gnupg2 ca-certificates && \
-  curl -fsSL https://deb.nodesource.com/gpgkey/nodesource-repo.gpg.key | gpg --dearmor -o /etc/apt/keyrings/nodesource.gpg && \
-  echo "deb [signed-by=/etc/apt/keyrings/nodesource.gpg] https://deb.nodesource.com/node_${NODE_MAJOR}.x nodistro main" | tee /etc/apt/sources.list.d/nodesource.list && \
   apt-get update && \
   apt-get install -y "nodejs=${NODE_MAJOR}.*" && \
   # todo: sendmail msmtp
