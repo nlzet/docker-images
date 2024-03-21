@@ -1,9 +1,10 @@
 ARG PHP_VERSION
 ARG PHP_EXTENSIONS
 ARG FROM_IMAGE=${FROM_IMAGE:-php:${PHP_VERSION}-fpm}
-ARG LOCALEGEN="en_US.UTF-8 UTF-8\nnl_NL.UTF-8 UTF-8\nnl_BE.UTF-8 UTF-8\nfr_FR.UTF-8 UTF-8\nde_DE.UTF-8 UTF-8"
+ARG LOCALEGEN="en_US.UTF-8 UTF-8\nnl_NL.UTF-8 UTF-8\nnl_BE.UTF-8 UTF-8\nfr_FR.UTF-8 UTF-8\nde_DE.UTF-8 UTF-8\nes_ES.UTF-8 UTF-8\nit_IT.UTF-8 UTF-8\nsv_SE.UTF-8 UTF-8"
 ARG UID=1000
 ARG GID=1000
+ARG NODE_MAJOR=16
 
 FROM debian:bookworm-slim AS builder
 
@@ -94,6 +95,7 @@ ARG PHP_EXTENSIONS
 ARG LOCALEGEN
 ARG UID
 ARG GID
+ARG NODE_MAJOR
 
 RUN \
   echo "date.timezone=UTC" > /usr/local/etc/php/conf.d/00-default.ini && \
@@ -101,7 +103,6 @@ RUN \
   groupadd -g $UID www &&  \
   useradd -u $UID -g $GID -ms /bin/bash www && \
   echo "alias ll='ls -la'" >> /home/www/.bashrc && \
-  echo "LANG=\"en_US.UTF-8\"" > /etc/default/locale && \
   echo $LOCALEGEN >> /etc/locale.gen && \
   apt-get update && \
   # installation of locales will trigger locale-gen.
@@ -129,20 +130,18 @@ ARG PHP_EXTENSIONS
 ARG LOCALEGEN
 ARG UID
 ARG GID
+ARG NODE_MAJOR
 
 USER root
-ENV NODE_MAJOR=16
 RUN \
   apt-get update && \
   apt-get install -y  gnupg gnupg2 ca-certificates && \
   curl -fsSL https://deb.nodesource.com/gpgkey/nodesource-repo.gpg.key | gpg --dearmor -o /etc/apt/keyrings/nodesource.gpg && \
-  echo "deb [signed-by=/etc/apt/keyrings/nodesource.gpg] https://deb.nodesource.com/node_$NODE_MAJOR.x nodistro main" | tee /etc/apt/sources.list.d/nodesource.list && \
+  echo "deb [signed-by=/etc/apt/keyrings/nodesource.gpg] https://deb.nodesource.com/node_${NODE_MAJOR}.x nodistro main" | tee /etc/apt/sources.list.d/nodesource.list && \
   apt-get update && \
-  # todo: find a better way with pinning
-  apt-get install -y nodejs='16.20.2-1nodesource1' && \
+  apt-get install -y "nodejs=${NODE_MAJOR}.*" && \
   # todo: sendmail msmtp
-#  apt-get install -y --no-install-recommends nodejs && \
-#  npm install -g npm@latest && \
+  npm install -g npm@latest && \
   npm install -g yarn pnpm && \
   # Allow extension enable for the user "www"
   chown -R $UID:$GID /usr/local/etc/php/conf.d/ && \
@@ -158,6 +157,7 @@ ARG PHP_EXTENSIONS
 ARG LOCALEGEN
 ARG UID
 ARG GID
+ARG NODE_MAJOR
 
 USER root
 RUN \

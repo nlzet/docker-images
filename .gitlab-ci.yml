@@ -97,9 +97,10 @@ php8.3:
     - cp -vf php/test/phpunit.10.xml.dist php/test/phpunit.xml.dist
     - apk update && apk add tar sudo
     - export PHP_VERSION=8.3
+    - export NODE_MAJOR=20
     - export DOCKER_PREFIX=nlzet/php
-    # skip mcrypt/imagick on php 8.3
-    - export PHP_EXTENSIONS="@composer amqp bcmath bz2 exif ffi gd gettext gmp igbinary intl mysqli pcntl pdo_mysql pdo_pgsql redis sockets soap xdebug xmlrpc xsl zip"
+    # skip imagick on php 8.3
+    - export PHP_EXTENSIONS="@composer amqp bcmath bz2 exif ffi gd gettext gmp igbinary intl mcrypt mysqli pcntl pdo_mysql pdo_pgsql redis sockets soap xdebug xmlrpc xsl zip"
     - docker login --username=$DOCKER_HUB_USERNAME --password=$DOCKER_HUB_PASSWORD
     - ./run.sh build cli stage1 "--no-cache"
     - ./run.sh build fpm stage2
