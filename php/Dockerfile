@@ -21,9 +21,6 @@ RUN \
   set -x && \
   apt-get update && apt-get install -y $pkgVolatile $pkgPersistent --no-install-recommends && \
   apt-get install -y gcc git curl gnupg gnupg2 ca-certificates && \
-  curl -fsSL https://deb.nodesource.com/gpgkey/nodesource-repo.gpg.key | gpg --dearmor -o /etc/apt/keyrings/nodesource.gpg && \
-  echo "deb [signed-by=/etc/apt/keyrings/nodesource.gpg] https://deb.nodesource.com/node_${NODE_MAJOR}.x nodistro main" | tee /etc/apt/sources.list.d/nodesource.list && \
-  echo cat /etc/apt/sources.list.d/nodesource.list && \
   wget -qq -O /usr/local/bin/mhsendmail https://github.com/mailhog/mhsendmail/releases/download/v0.2.0/mhsendmail_linux_amd64 && \
   chmod +x /usr/local/bin/mhsendmail && \
   mkdir -p /tmp/mozjpeg && git clone --quiet --depth=1 https://github.com/mozilla/mozjpeg.git /tmp/mozjpeg && mkdir -p /tmp/mozjpeg/build && cd /tmp/mozjpeg/build && cmake -DCMAKE_INSTALL_PREFIX=/usr/local/ -DENABLE_STATIC=1 -DENABLE_SHARED=0 .. && make && make install && cd / && \
@@ -107,6 +104,15 @@ ARG GID
 ARG NODE_MAJOR
 
 RUN \
+  apt-get update && \
+  apt-get install -y  gnupg gnupg2 ca-certificates && \
+  curl -fsSL https://deb.nodesource.com/gpgkey/nodesource-repo.gpg.key | gpg --dearmor -o /etc/apt/keyrings/nodesource.gpg && \
+  echo "deb [signed-by=/etc/apt/keyrings/nodesource.gpg] https://deb.nodesource.com/node_${NODE_MAJOR}.x nodistro main" | tee /etc/apt/sources.list.d/nodesource.list && \
+  echo cat /etc/apt/sources.list.d/nodesource.list && \
+  apt-get update && \
+  apt-get install -y "nodejs=${NODE_MAJOR}.*" && \
+  npm install -g npm@latest && \
+  npm install -g yarn pnpm && \
   echo "date.timezone=UTC" > /usr/local/etc/php/conf.d/00-default.ini && \
   echo "memory_limit=-1" > /usr/local/etc/php/php-cli.ini && \
   groupadd -g $UID www &&  \
@@ -143,11 +149,7 @@ ARG NODE_MAJOR
 
 USER root
 RUN \
-  apt-get update && \
-  apt-get install -y "nodejs=${NODE_MAJOR}.*" && \
   # todo: sendmail msmtp
-  npm install -g npm@latest && \
-  npm install -g yarn pnpm && \
   # Allow extension enable for the user "www"
   chown -R $UID:$GID /usr/local/etc/php/conf.d/ && \
   rm -rf /tmp/* /var/tmp/* /var/lib/{apt,dpkg,cache,log}/ && \
