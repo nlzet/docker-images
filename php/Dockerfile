@@ -29,6 +29,7 @@ ARG PHP_EXTENSIONS
 ARG LOCALEGEN
 ARG UID
 ARG GID
+ARG NODE_MAJOR
 
 COPY --from=builder /usr/local/bin/jpegtran /usr/local/bin/jpegtran
 #COPY --from=builder /etc/mozjpeg/lib64 /etc/mozjpeg/lib64
