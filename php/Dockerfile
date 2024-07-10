@@ -191,9 +191,11 @@ RUN \
 USER www
 ENV PATH="${PATH}:/home/www/.yarn/bin/"
 RUN \
-  yarn global add @api-platform/client-generator @quasar/cli cypress && \
+  yarn global add @api-platform/client-generator @quasar/cli cypress @playwright/test && \
   yarn cache clean && \
   rm -rf /tmp/* /var/tmp/* /var/lib/{apt,dpkg,cache,log}/
 
 CMD ["php", "-a"]
 USER root
+RUN \
+  $(yarn global bin)/playwright install --with-deps
