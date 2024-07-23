@@ -111,7 +111,7 @@ RUN \
   echo cat /etc/apt/sources.list.d/nodesource.list && \
   apt-get update && \
   apt-get install -y "nodejs=${NODE_MAJOR}.*" && \
-  npm install -g npm@latest && \
+  # npm install -g npm@latest && \
   npm install -g yarn pnpm && \
   # yarn global add @playwright/test && \
   # $(yarn global bin)/playwright install --with-deps && \
