@@ -113,8 +113,8 @@ RUN \
   apt-get install -y "nodejs=${NODE_MAJOR}.*" && \
   npm install -g npm@latest && \
   npm install -g yarn pnpm && \
-  yarn global add @playwright/test && \
-  $(yarn global bin)/playwright install --with-deps && \
+  # yarn global add @playwright/test && \
+  # $(yarn global bin)/playwright install --with-deps && \
   echo "date.timezone=UTC" > /usr/local/etc/php/conf.d/00-default.ini && \
   echo "memory_limit=-1" > /usr/local/etc/php/php-cli.ini && \
   groupadd -g $UID www &&  \
