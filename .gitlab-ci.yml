@@ -41,7 +41,7 @@ php8.1:
     - cp -vf php/test/phpunit.10.xml.dist php/test/phpunit.xml.dist
     - apk update && apk add tar sudo
     - export PHP_VERSION=8.1
-    - export NODE_MAJOR=18
+    - export NODE_MAJOR=16
     - export DOCKER_PREFIX=nlzet/php
     - docker login --username=$DOCKER_HUB_USERNAME --password=$DOCKER_HUB_PASSWORD
     - ./run.sh build cli stage1 "--no-cache"
