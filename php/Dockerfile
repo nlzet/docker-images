@@ -111,10 +111,9 @@ RUN \
   echo cat /etc/apt/sources.list.d/nodesource.list && \
   apt-get update && \
   apt-get install -y "nodejs=${NODE_MAJOR}.*" && \
+  # todo: error on node16
   # npm install -g npm@latest && \
   npm install -g yarn pnpm && \
-  yarn global add @playwright/test@1.44.1 && \
-  $(yarn global bin)/playwright install --with-deps && \
   echo "date.timezone=UTC" > /usr/local/etc/php/conf.d/00-default.ini && \
   echo "memory_limit=-1" > /usr/local/etc/php/php-cli.ini && \
   groupadd -g $UID www &&  \
@@ -179,6 +178,9 @@ RUN \
     pkgDel='' && \
     set -x && \
     apt-get update && apt-get install -y $pkgLib --no-install-recommends && \
+    # todo: remove fixed version after removing node 16
+    yarn global add @playwright/test@1.44.1 && \
+    $(yarn global bin)/playwright install-deps && \
     apt-get purge -y --auto-remove $pkgDel && \
     rm -rf /tmp/* /var/tmp/* /var/lib/{apt,dpkg,cache,log}/ && \
     wget https://get.symfony.com/cli/installer -O - | bash && \
