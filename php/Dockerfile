@@ -181,6 +181,7 @@ RUN \
     # todo: remove fixed version after removing node 16
     yarn global add @playwright/test@1.44.1 && \
     $(yarn global bin)/playwright install-deps && \
+    $(yarn global bin)/playwright install msedge && \
     yarn global remove @playwright/test && \
     apt-get purge -y --auto-remove $pkgDel && \
     rm -rf /tmp/* /var/tmp/* /var/lib/{apt,dpkg,cache,log}/ && \
