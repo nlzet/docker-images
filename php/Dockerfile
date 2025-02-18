@@ -4,7 +4,7 @@ ARG FROM_IMAGE=${FROM_IMAGE:-php:${PHP_VERSION}-fpm}
 ARG LOCALEGEN="en_US.UTF-8 UTF-8\nnl_NL.UTF-8 UTF-8\nnl_BE.UTF-8 UTF-8\nfr_FR.UTF-8 UTF-8\nde_DE.UTF-8 UTF-8\nes_ES.UTF-8 UTF-8\nit_IT.UTF-8 UTF-8\nsv_SE.UTF-8 UTF-8"
 ARG UID=1000
 ARG GID=1000
-ARG NODE_MAJOR=16
+ARG NODE_MAJOR=20
 
 FROM debian:bookworm-slim AS builder
 ARG PHP_VERSION
@@ -199,7 +199,8 @@ USER www
 ENV PATH="${PATH}:/home/www/.yarn/bin/"
 RUN \
   # todo: remove fixed playwright version after removing node 16
-  yarn global add @api-platform/client-generator @quasar/cli cypress @playwright/test@1.44.1 && \
+  yarn global add @api-platform/client-generator && \
+  # @quasar/cli cypress @playwright/test@1.44.1 && \
   $(yarn global bin)/playwright install && \
   yarn cache clean && \
   rm -rf /tmp/* /var/tmp/* /var/lib/{apt,dpkg,cache,log}/

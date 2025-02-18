@@ -9,6 +9,7 @@ export PHP_EXTENSIONS=
 # override
 export DOCKER_PREFIX=nlzet/php
 export PHP_VERSION=8.3
+export NODE_MAJOR=20
 
 ./run.sh build cli stage1 "--no-cache"
 ./run.sh build fpm stage2
