@@ -1,15 +1,16 @@
 #!/usr/bin/env sh
+set -euxo pipefail
 
 # configuration defaults
-PHP_VERSION=${PHP_VERSION:-7.4}
+PHP_VERSION=${PHP_VERSION:-8.3}
 DOCKER_PREFIX=${DOCKER_PREFIX:-nlzet/php}
-NODE_MAJOR=${NODE_MAJOR:-16}
+NODE_MAJOR=${NODE_MAJOR:-20}
 
 prepare() {
   # configure defaults if not set
   FROM_IMAGE=${FROM_IMAGE:-php:${PHP_VERSION}-fpm}
   PHP_EXTENSIONS=${PHP_EXTENSIONS:-@composer amqp gd bcmath bz2 exif ffi gd gettext gmp igbinary imagick intl mcrypt mysqli opcache pcntl pdo_mysql pdo_pgsql redis sockets soap xdebug xsl zip}
-  NODE_MAJOR=${NODE_MAJOR:-16}
+  NODE_MAJOR=${NODE_MAJOR:-20}
 
   # parse PHP version number
   docker pull ${FROM_IMAGE} > /dev/null 2>&1
@@ -23,7 +24,6 @@ prepare() {
   export DOCKER_TAG="${DOCKER_PREFIX}:${PHP_VERSION_MAJOR}.${PHP_VERSION_MINOR}"
 
   # print configuration
-  echo " "
   echo "=== BUILD CONFIGURATION === "
   echo " "
   echo "PHP_VERSION: ${PHP_VERSION} (${PHP_VERSION_MAJOR}.${PHP_VERSION_MINOR}.${PHP_VERSION_RELEASE})"
@@ -32,17 +32,12 @@ prepare() {
   echo "DOCKER_PREFIX: ${DOCKER_PREFIX}"
   echo "DOCKER_TAG: ${DOCKER_TAG}"
   echo "NODE_MAJOR: ${NODE_MAJOR}"
-  echo " "
-
-  # print commands to output
-  set -x
 }
 
 buildimage () {
   echo "#########"
   echo "> Building image: ${DOCKER_TAG}-$1"
   echo "#########"
-  echo " "
   echo docker build --build-arg PHP_EXTENSIONS="${PHP_EXTENSIONS}" --build-arg FROM_IMAGE=${FROM_IMAGE} --build-arg NODE_MAJOR=${NODE_MAJOR} --target $2 -t ${DOCKER_TAG}-$1 php/ $3
   docker build --build-arg PHP_EXTENSIONS="${PHP_EXTENSIONS}" --build-arg FROM_IMAGE=${FROM_IMAGE} --build-arg NODE_MAJOR=${NODE_MAJOR} --target $2 -t ${DOCKER_TAG}-$1 php/ $3
 }
@@ -51,7 +46,6 @@ testcontainer () {
   echo "#########"
   echo "> Testing container: $1"
   echo "#########"
-  echo " "
 
   docker exec -w /var/www/php/test/ -i $1 php ./vendor/bin/phpunit -c ./phpunit.xml.dist --testsuite test
 }
@@ -60,7 +54,6 @@ testimage () {
   echo "#########"
   echo "> Testing: $1"
   echo "#########"
-  echo " "
 
   docker run \
     -w /var/www/php/test/ \
@@ -74,7 +67,6 @@ testxdebugimage () {
   echo "#########"
   echo "> Testing Xdebug: $1"
   echo "#########"
-  echo " "
 
   docker run \
     -w /var/www/php/test/ \
@@ -91,21 +83,18 @@ squashimage () {
   echo "#########"
   echo "> Squashing image: $1"
   echo "#########"
-  echo " "
 
   docker image ls $1 | tail -n 1
   docker save $1 | docker-squash -o squashed.tar -t $1
   tar --delete -f squashed.tar manifest.json && cat squashed.tar | docker load
   rm -f image.tar squashed.tar
   docker image ls $1 | tail -n 1
-  echo " "
 }
 
 pushimage () {
   echo "#########"
   echo "> Pushing image: $1"
   echo "#########"
-  echo " "
   docker image ls $1 | tail -n 1
   docker push $1
 }

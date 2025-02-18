@@ -23,7 +23,8 @@ RUN \
   apt-get install -y gcc git curl gnupg gnupg2 ca-certificates && \
   wget -qq -O /usr/local/bin/mhsendmail https://github.com/mailhog/mhsendmail/releases/download/v0.2.0/mhsendmail_linux_amd64 && \
   chmod +x /usr/local/bin/mhsendmail && \
-  mkdir -p /tmp/mozjpeg && git clone --quiet --depth=1 https://github.com/mozilla/mozjpeg.git /tmp/mozjpeg && mkdir -p /tmp/mozjpeg/build && cd /tmp/mozjpeg/build && cmake -DCMAKE_INSTALL_PREFIX=/usr/local/ -DENABLE_STATIC=1 -DENABLE_SHARED=1 .. && make && make install && cd / && \
+  export CFLAGS='-fPIC' && \
+  mkdir -p /tmp/mozjpeg && git clone --quiet --depth=1 https://github.com/mozilla/mozjpeg.git /tmp/mozjpeg && mkdir -p /tmp/mozjpeg/build && cd /tmp/mozjpeg/build && cmake -DCMAKE_INSTALL_PREFIX=/usr/local/ -DENABLE_STATIC=1 -DENABLE_SHARED=0 .. && make && make install && cd / && \
   mkdir -p /tmp/webp && cd /tmp/webp && wget -qq -O libwebp.tar.gz https://storage.googleapis.com/downloads.webmproject.org/releases/webp/libwebp-1.2.2-rc2-linux-x86-64.tar.gz && gunzip -c libwebp.tar.gz | tar x --strip-components=1 && cp -v /tmp/webp/bin/* /usr/local/bin/ && cd / && rm -rf /tmp/webp && \
   apt-get purge -y --auto-remove $pkgVolatile && \
   rm -rf /tmp/* /var/tmp/* /var/lib/{apt,dpkg,cache,log}/

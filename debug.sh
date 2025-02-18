@@ -1,10 +1,11 @@
 #!/usr/bin/env sh
+set -euxo pipefail
 
 # configuration defaults
-IMAGE_BASE=php:7.4-fpm
-IMAGE_CLI=nlzet/php:7.4-cli
-IMAGE_FPM=nlzet/php:7.4-fpm
-IMAGE_CI=nlzet/php:7.4-ci
+IMAGE_BASE=php:8.3-fpm
+IMAGE_CLI=nlzet/php:8.3-cli
+IMAGE_FPM=nlzet/php:8.3-fpm
+IMAGE_CI=nlzet/php:8.3-ci
 CONTAINER_BASE=base
 CONTAINER_CLI=cli
 CONTAINER_FPM=fpm

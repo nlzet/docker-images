@@ -6,39 +6,11 @@ cache: &global_cache
 stages:
   - build
 
-#php8.0:
-#  tags: ["docker"]
-#  stage: build
-#  image: docker
-#  script:
-#    - cp -vf php/test/phpunit.10.xml.dist php/test/phpunit.xml.dist
-#    - apk update && apk add tar sudo
-#    - export PHP_VERSION=8.0
-#    - export DOCKER_PREFIX=nlzet/php
-#    - docker login --username=$DOCKER_HUB_USERNAME --password=$DOCKER_HUB_PASSWORD
-#    - ./run.sh build cli stage1 "--no-cache"
-#    - ./run.sh build fpm stage2
-#    - ./run.sh build ci stage3
-#    - docker run -w /var/www/php/test/ -v /tmp/composercache/:/home/www/.composer/cache/ -v $(pwd)/:/var/www -i ${DOCKER_PREFIX}:${PHP_VERSION}-cli composer update -W
-#    - ./run.sh testxdebug
-#    - ./run.sh push cli
-#    - ./run.sh push fpm
-#    - ./run.sh push ci
-#  artifacts:
-#    paths:
-#      - php/test/data/out_*
-#    expire_in: 7 days
-#    when: always
-#  services:
-#    - name: docker:dind
-#      alias: docker
-
 php8.1:
   tags: ["docker"]
   stage: build
   image: docker
   script:
-    - cp -vf php/test/phpunit.10.xml.dist php/test/phpunit.xml.dist
     - apk update && apk add tar sudo
     - export PHP_VERSION=8.1
     - export NODE_MAJOR=16
@@ -66,7 +38,6 @@ php8.2:
   stage: build
   image: docker
   script:
-    - cp -vf php/test/phpunit.10.xml.dist php/test/phpunit.xml.dist
     - apk update && apk add tar sudo
     - export PHP_VERSION=8.2
     - export NODE_MAJOR=18
@@ -96,7 +67,6 @@ php8.3:
   stage: build
   image: docker
   script:
-    - cp -vf php/test/phpunit.10.xml.dist php/test/phpunit.xml.dist
     - apk update && apk add tar sudo
     - export PHP_VERSION=8.3
     - export NODE_MAJOR=20

@@ -14,9 +14,7 @@ This repository serves as an easy way to configure and build docker PHP images (
 
 | Tag                                                          | Stage |
 |--------------------------------------------------------------|--|
-| [nlzet/php:7.4-cli](https://hub.docker.com/r/nlzet/php/tags) | stage1 |
-| [nlzet/php:7.4-fpm](https://hub.docker.com/r/nlzet/php/tags) | stage2 |
-| [nlzet/php:7.4-ci](https://hub.docker.com/r/nlzet/php/tags)  | stage3 |
+
 | [nlzet/php:8.0-cli](https://hub.docker.com/r/nlzet/php/tags) | stage1 |
 | [nlzet/php:8.0-fpm](https://hub.docker.com/r/nlzet/php/tags) | stage2 |
 | [nlzet/php:8.0-ci](https://hub.docker.com/r/nlzet/php/tags)  | stage3 |
@@ -26,8 +24,11 @@ This repository serves as an easy way to configure and build docker PHP images (
 | [nlzet/php:8.2-cli](https://hub.docker.com/r/nlzet/php/tags) | stage1 |
 | [nlzet/php:8.2-fpm](https://hub.docker.com/r/nlzet/php/tags) | stage2 |
 | [nlzet/php:8.2-ci](https://hub.docker.com/r/nlzet/php/tags)  | stage3 |
+| [nlzet/php:8.3-cli](https://hub.docker.com/r/nlzet/php/tags) | stage1 |
+| [nlzet/php:8.3-fpm](https://hub.docker.com/r/nlzet/php/tags) | stage2 |
+| [nlzet/php:8.3-ci](https://hub.docker.com/r/nlzet/php/tags)  | stage3 |
 
-All tags are built weekly (on Thursday) based on the official php `major.minor` php tags (e.g. `php:7.4-fpm`). The following defaults are applied to these builds:
+All tags are built weekly (on Thursday) based on the official php `major.minor` php tags (e.g. `php:8.3-fpm`). The following defaults are applied to these builds:
 
 | Option | Value                                                                                                                                            |
 |--|--------------------------------------------------------------------------------------------------------------------------------------------------|
@@ -43,14 +44,14 @@ Available options and information are described below:
   
 ### Build options
 
-| Variable | Description | Default | 
-|--|--|--|
-|PHP_VERSION|Choose the PHP version, you can select major, minor and patch version. E.g. `7`, `7.4` or `7.4.10`| |
-|PHP_EXTENSIONS|Choose the PHP extensions to install, select supported extensions from [https://github.com/mlocati/docker-php-extension-installer#supported-php-extensions](https://github.com/mlocati/docker-php-extension-installer#supported-php-extensions)| |
-|LOCALEGEN|String containing the locales to install, seperated by `\n`|`en_US.UTF-8 UTF-8\nnl_NL.UTF-8 UTF-8\nnl_BE.UTF-8 UTF-8\nfr_FR.UTF-8 UTF-8\nde_DE.UTF-8 UTF-8\nes_ES.UTF-8 UTF-8\nit_IT.UTF-8 UTF-8\nsv_SE.UTF-8 UTF-8`|
-|UID| www user id | `1000` |
-|GID| www group id | `1000` |
-|NODE_MAJOR| nodejs major version | `16` |
+| Variable | Description                                                                                                                                                                                                                                     | Default | 
+|--|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|--|
+|PHP_VERSION| Choose the PHP version, you can select major, minor and patch version. E.g. `8`, `8.3` or `8.3.10`                                                                                                                                              | |
+|PHP_EXTENSIONS| Choose the PHP extensions to install, select supported extensions from [https://github.com/mlocati/docker-php-extension-installer#supported-php-extensions](https://github.com/mlocati/docker-php-extension-installer#supported-php-extensions) | |
+|LOCALEGEN| String containing the locales to install, seperated by `\n`                                                                                                                                                                                     |`en_US.UTF-8 UTF-8\nnl_NL.UTF-8 UTF-8\nnl_BE.UTF-8 UTF-8\nfr_FR.UTF-8 UTF-8\nde_DE.UTF-8 UTF-8\nes_ES.UTF-8 UTF-8\nit_IT.UTF-8 UTF-8\nsv_SE.UTF-8 UTF-8`|
+|UID| www user id                                                                                                                                                                                                                                     | `1000` |
+|GID| www group id                                                                                                                                                                                                                                    | `1000` |
+|NODE_MAJOR| nodejs major version                                                                                                                                                                                                                            | `16` |
 
 ### Auto-generated options
 
@@ -73,7 +74,7 @@ Available options and information are described below:
 
     docker build \
 	    --build-arg PHP_EXTENSIONS="gd xdebug" \
-	    --build-arg PHP_VERSION=7.4 \
+	    --build-arg PHP_VERSION=8.3 \
 	    --target stage1 \
 	    php/ \
 	    --pull
@@ -85,30 +86,30 @@ Available options and information are described below:
 ### Check PHP configuration:
 
     # get version
-    docker run -it nlzet/php:8.2-cli php -v
+    docker run -it nlzet/php:8.3-cli php -v
     
     # list configured modules
-    docker run -it nlzet/php:8.2-cli php -m
+    docker run -it nlzet/php:8.3-cli php -m
     
     # list configured ini files
-    docker run -it nlzet/php:8.2-cli php --ini
+    docker run -it nlzet/php:8.3-cli php --ini
     
 ### Enable Xdebug:
     
     # command line argument
-    docker run -it nlzet/php:8.2-cli php -d zend_extension=xdebug.so -v
+    docker run -it nlzet/php:8.3-cli php -d zend_extension=xdebug.so -v
     
     # or with a mounted .ini file, containing "zend_extension=xdebug.so"
-    docker run -v $(pwd)/xdebug.ini:/usr/local/etc/php/conf.d/99-enable-xdebug.ini -it nlzet/php:8.2-cli php -v
+    docker run -v $(pwd)/xdebug.ini:/usr/local/etc/php/conf.d/99-enable-xdebug.ini -it nlzet/php:8.3-cli php -v
     
 ## FPM:
     
     # start fpm container, wich will directly start php-fpm
-    docker run -it nlzet/php:8.2-fpm    
+    docker run -it nlzet/php:8.3-fpm    
 
 ## Docker pull all:
 
-    versions=(8.0 8.1 8.2)
+    versions=(8.1 8.2 8.3)
     tags=(ci fpm cli)
 
     for version in $versions
@@ -122,7 +123,7 @@ Available options and information are described below:
 
 # Check composer / php versions
 
-    versions=(8.0 8.1 8.2)
+    versions=(8.1 8.2 8.3)
     tags=(ci fpm cli)
 
     for version in $versions
